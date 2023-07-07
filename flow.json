@@ -1,0 +1,28 @@
+{
+  "contracts": {
+    "helloworld": "./cadence/helloworld.cdc",
+    "nft_contract": "./cadence/contracts/NFTContract.cdc",
+    "marketplace": "./cadence/contracts/Marketplace.cdc"
+  },
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "sandboxnet": "access.sandboxnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "key": "3bb22545881423eb7269a8983f01d4d48652be549f36746e301226aa1732cba3"
+    },
+    "shravan": {
+      "address": "0x848c318deca591e8",
+      "key": "cc1fd85fbbb7f3a6b4be84376c7b012ff7796e2214cd572786a40bd6949ee0c4"
+    }
+  },
+  "deployments": {
+    "testnet": {
+      "shravan": ["nft_contract"]
+    }
+  }
+}
