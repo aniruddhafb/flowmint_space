@@ -48,8 +48,8 @@ const GameComponent = () => {
     const ctx = canvas.getContext('2d');
 
     const images = [
-      { src: "../Colorful.png", x: 25, y: 10 },
-      { src: "../Colorful.png", x: 91, y: 70 }
+      { src: "../logo_bg.png", x: 25, y: 10 },
+      { src: "../logo_bg.png", x: 91, y: 70 }
     ];
 
     // Set the desired width and height for each image
