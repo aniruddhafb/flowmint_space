@@ -25,3 +25,19 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+canvas {
+  user-select: none;
+  width: 1000px;
+  height: 1000px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-image: repeating-linear-gradient(
+      #7000ff 0 1px,
+      transparent 1px 100px
+    ),
+    repeating-linear-gradient(90deg, #7000ff 0 1px, transparent 1px 100px);
+  background-size: 10px 10px;
+  background-color: #21004b;
+}
