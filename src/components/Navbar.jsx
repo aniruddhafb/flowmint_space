@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import defaultAvatar from "../../public/avatar.png";
+import webLogo from "../../public/whitefav.png";
 
 const Navbar = ({ userAddress, logIn, logOut }) => {
 
@@ -11,13 +12,13 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
     return (
         <nav
             x-data="{ isOpen: false }"
-            className="relative bg-white shadow dark:bg-gray-800"
+            className="relative bg-[#21004b] shadow"
         >
             <div className="container px-6 py-4 mx-auto">
                 <div className="lg:flex lg:items-center lg:justify-between">
                     <div className="flex items-center justify-between text-center">
                         <Link href="/" className="flex flex-row justify-center align-middle">
-                            <h1 className="text-xl font-[400] text-yellow-50 text-center mt-1">FLOWMINT</h1>
+                            <Image src={webLogo} height={100} width={100} />
                         </Link>
 
                         {/* action button  */}
@@ -57,7 +58,7 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
 
                     {/* navbar drop down  */}
                     {navDropDown ? (
-                        <div className="absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
+                        <div className="absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-[#21004b] lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
 
 
                             {userAddress ? (
@@ -86,11 +87,11 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
                                         </button>
 
                                         {showProfile && (
-                                            <div className="absolute left-[-60px] top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800">
+                                            <div className="absolute left-[-60px] top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
                                                 <a
                                                     href="#"
                                                     rel="noreferrer"
-                                                    className="flex items-center p-3 -mt-2 text-sm text-gray-600 transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                    className="flex items-center p-3 -mt-2 text-sm text-gray-600 transition-colors duration-300 transform"
                                                 >
                                                     <Image
                                                         src={defaultAvatar}
@@ -118,7 +119,7 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
                                                     href="#"
                                                     onClick={logOut}
                                                     rel="noreferrer"
-                                                    className="flex items-center p-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                    className="flex items-center p-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 "
                                                 >
                                                     <svg
                                                         className="w-5 h-5 mx-1"

@@ -212,7 +212,7 @@ const MainPage = () => {
         <div>all nfts </div>
       </div> */}
 
-      <div style={{ backgroundColor: "black" }}>
+      <div style={{ backgroundColor: "#3b0087", padding: "35px 0", display: "flex", justifyContent: 'center', alignItems: "center" }}>
         <canvas
           ref={canvasRef}
           onClick={handleTileClick}
