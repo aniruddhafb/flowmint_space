@@ -7,6 +7,7 @@ import webLogo from "../../public/whitefav.png";
 const Navbar = ({ userAddress, logIn, logOut }) => {
 
     const [showProfile, SetShowProfile] = useState(false);
+    const [myNFTs, setMyNFTs] = useState(false);
     const [navDropDown, setnavDropDown] = useState(true);
 
     return (
@@ -87,7 +88,7 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
                                         </button>
 
                                         {showProfile && (
-                                            <div className="absolute left-[-60px] top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
+                                            <div className="absolute left-[5%] top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
                                                 <a
                                                     href="#"
                                                     rel="noreferrer"
@@ -113,7 +114,25 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
                                                         </p>
                                                     </div>
                                                 </a>
+                                                <Link
+                                                    href="#"
+                                                    onClick={() => (setMyNFTs(true), SetShowProfile(false))}
+                                                    className="flex items-center p-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300"
+                                                >
+                                                    <svg
+                                                        className="w-5 h-5 mx-1"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            d="M21 19H3C1.89543 19 1 18.1046 1 17V16H3V7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7V16H23V17C23 18.1046 22.1046 19 21 19ZM5 7V16H19V7H5Z"
+                                                            fill="currentColor"
+                                                        ></path>
+                                                    </svg>
 
+                                                    <span className="mx-1">My Segments</span>
+                                                </Link>
                                                 <hr className="border-gray-200 dark:border-gray-700 " />
                                                 <a
                                                     href="#"
@@ -135,6 +154,29 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
 
                                                     <span className="mx-1">Sign Out</span>
                                                 </a>
+                                            </div>
+                                        )}
+                                        {myNFTs && (
+                                            <div style={{ height: "80vh", width: "400px" }} className="absolute top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
+                                                <button
+                                                    type="button"
+                                                    className="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Close"
+                                                    onClick={() => (SetShowProfile(false), setMyNFTs(false))}
+                                                    style={{ position: "absolute", right: "5px" }}
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        width="24"
+                                                        height="24"
+                                                        className="h-6 w-6 fill-jacarta-700 dark:fill-white"
+                                                    >
+                                                        <path fill="none" d="M0 0h24v24H0z" />
+                                                        <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
+                                                    </svg>
+                                                </button>
                                             </div>
                                         )}
                                     </div>
