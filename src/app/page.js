@@ -8,35 +8,48 @@ import { mintNFT } from "../../cadence/transactions/mint_nfts.js";
 import { setupUserTx } from "../../cadence/transactions/setup_user.js";
 
 import { getNFTs } from "../../cadence/scripts/get_nfts.js";
+import Footer from "@/components/Footer.jsx";
+import Navbar from "@/components/Navbar.jsx";
 
-const GameComponent = () => {
+const MainPage = () => {
   const storage = new ThirdwebStorage();
 
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
   const [file, set_file] = useState();
   const [selected_pixels, set_selected_pixels] = useState();
+
+  const canvasRef = useRef(null);
+  const [selectedTiles, setSelectedTiles] = useState([]);
+  const tileSize = 10;
+
   fcl
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
     .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
 
+  // login 
   const logIn = () => {
     fcl.authenticate();
   };
 
-  useEffect(() => {
-    //sets user to logged in user
+  // logout 
+  const logOut = () => {
+    fcl.unauthenticate();
+  };
 
+  //sets user to logged in user
+  useEffect(() => {
     fcl.currentUser().subscribe(set_user);
   }, []);
 
+  // getting nfts 
   useEffect(() => {
-    // if (!user?.addr) return;
-
+    if (!user?.addr) return;
     getUserNFTs();
   }, [user?.addr]);
 
+  // getting all users nfts 
   const getUserNFTs = async () => {
     const result = await fcl
       .send([
@@ -64,6 +77,8 @@ const GameComponent = () => {
     return fcl.tx(txn_id).onceSealed();
   };
 
+
+  // minting nft segment 
   const mint = async () => {
     try {
       const ipfs_hash = await storage.upload(file);
@@ -95,10 +110,6 @@ const GameComponent = () => {
       console.log("Error uploading image to ipfs");
     }
   };
-
-  const canvasRef = useRef(null);
-  const [selectedTiles, setSelectedTiles] = useState([]);
-  const tileSize = 10;
 
   // Function to handle tile selection
   const handleTileClick = (event) => {
@@ -171,7 +182,7 @@ const GameComponent = () => {
 
     selectedTiles.forEach((tile) => {
       const { x, y } = tile;
-      ctx.fillStyle = "gold";
+      ctx.fillStyle = "#00ef8b";
       ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
     });
   };
@@ -182,13 +193,9 @@ const GameComponent = () => {
 
   return (
     <>
-      <div>
-        <div>Hello, World</div>
-        <h1>{user?.addr}</h1>
-        <button onClick={() => logIn()}>Log In</button>
-        {/* <button onClick={() => fcl.unauthenticate()}>Log out</button> */}
-        {/* <button onClick={() => setupUser()}>Setup User</button> */}
+      <Navbar userAddress={user?.addr} logIn={logIn} logOut={logOut} />
 
+      {/* <div>
         <div>
           <input
             type="text"
@@ -203,7 +210,8 @@ const GameComponent = () => {
           <button onClick={() => mint()}>Mint</button>
         </div>
         <div>all nfts </div>
-      </div>
+      </div> */}
+
       <div style={{ backgroundColor: "black" }}>
         <canvas
           ref={canvasRef}
@@ -213,8 +221,10 @@ const GameComponent = () => {
           height={1000}
         />
       </div>
+
+      <Footer />
     </>
   );
 };
 
-export default GameComponent;
+export default MainPage;
