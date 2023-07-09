@@ -259,7 +259,7 @@ const MainPage = () => {
                   </svg>
                 </button>
 
-                <form action="#" style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: 'center', padding: "22px 0 0 0" }}>
+                <form onSubmit={mint} style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: 'center', padding: "22px 0 0 0" }}>
                   <div style={{ display: "flex", justifyContent: "row", alignItems: "center", justifyContent: "center" }}>
                     <p>Title - </p>
                     <input
@@ -318,8 +318,7 @@ const MainPage = () => {
                     </button>
                     :
                     <button
-                      onClick={() => mint()}
-                      type="button"
+                      type="submit"
                       className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
                       style={{ marginTop: "30px" }}
                     >
