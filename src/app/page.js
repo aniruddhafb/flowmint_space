@@ -92,7 +92,8 @@ const MainPage = () => {
   };
 
   // minting nft segment
-  const mint = async () => {
+  const mint = async (e) => {
+    e.preventDefault();
     setNFTMinting(true);
     try {
       const ipfs_hash = await storage.upload(file);
@@ -442,8 +443,8 @@ const MainPage = () => {
                     </button>
                   ) : (
                     <button
-                      // type="submit"
-                      onClick={mint}
+                      type="submit"
+                      // onClick={mint}
                       className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
                       style={{ marginTop: "30px" }}
                     >
