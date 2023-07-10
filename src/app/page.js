@@ -25,6 +25,7 @@ const MainPage = () => {
 
   const [isMintingModal, setIsMinting] = useState(false);
   const [isNFTMinting, setNFTMinting] = useState(false);
+  const [myNFTs, setMyNFTs] = useState(false);
 
   const canvasRef = useRef(null);
   const [selectedTiles, setSelectedTiles] = useState([]);
@@ -244,7 +245,7 @@ const MainPage = () => {
 
   return (
     <>
-      <Navbar userAddress={user?.addr} logIn={logIn} logOut={logOut} />
+      <Navbar userAddress={user?.addr} logIn={logIn} logOut={logOut} setMyNFTs={setMyNFTs} myNFTs={myNFTs} />
 
       <div
         style={{
@@ -268,6 +269,30 @@ const MainPage = () => {
           />
         </div>
 
+        {myNFTs &&
+          <div style={{ height: "91vh", width: "400px", border: "2px solid #7000ff" }} className="fixed right-0 top-[60px] py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] shadow-xl" >
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              onClick={() => (setMyNFTs(false))}
+              style={{ position: "absolute", right: "5px" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                className="h-6 w-6 fill-jacarta-700 dark:fill-white"
+              >
+                <path fill="none" d="M0 0h24v24H0z" />
+                <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
+              </svg>
+            </button>
+          </div>
+        }
+
         {selectedTiles != "" && (
           <div style={{ marginTop: "30px" }}>
             <button
@@ -281,10 +306,10 @@ const MainPage = () => {
 
         {isMintingModal && (
           <>
-            <div className="backdrop-blur-lg absolute w-[100%] h-[100%] z-10"></div>
+            <div className="backdrop-blur-lg absolute w-[100%] h-[200%] z-10"></div>
             <div
-              className="fixed py-2 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl z-50"
-              style={{ marginBottom: "180px", border: "6px solid #7000ff" }}
+              className="absolute py-2 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl z-50"
+              style={{ border: "6px solid #7000ff" }}
             >
               <div style={{ padding: "20px 40px" }}>
                 <h3>Mint your segment</h3>
