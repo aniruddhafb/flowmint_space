@@ -96,7 +96,11 @@ const MainPage = () => {
       const nft_data = JSON.stringify({
         ipfs_hash,
         nft_name,
+        nft_link,
         selectedTiles,
+        nft_iniNFTCord,
+        nftHeight,
+        nftWidth
       });
 
       // const added = await client.add(file);
