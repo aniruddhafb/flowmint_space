@@ -64,10 +64,13 @@ const MainPage = () => {
 
   // getting all users nfts
   const getUserNFTs = async () => {
-    const result = await fcl.send([
-      fcl.script(getNFTs),
-      fcl.args([fcl.arg("0xae768da09c4cec20", t.Address)]),
-    ]).then(fcl.decode);
+    const result = await fcl
+      .send([
+        fcl.script(getNFTs),
+        fcl.args([fcl.arg("0xcd355bc6287d783d", t.Address)]),
+        // fcl.args([fcl.arg("0xae768da09c4cec20", t.Address)]),
+      ])
+      .then(fcl.decode);
     console.log({ result });
   };
 
@@ -162,12 +165,12 @@ const MainPage = () => {
   useEffect(() => {
     renderImages();
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     for (let y = 0; y < numRows; y++) {
       for (let x = 0; x < numColumns; x++) {
         const tileKey = `${x}-${y}`;
-        const color = tileColors[tileKey] || '#21004b';
+        const color = tileColors[tileKey] || "#21004b";
         ctx.fillStyle = color;
         ctx.strokeStyle = "#7000ff";
         ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
@@ -175,7 +178,6 @@ const MainPage = () => {
       }
     }
   }, [tileColors]);
-
 
   // when mouse cursor is triggered
   const handleMouseDown = (event) => {
@@ -186,7 +188,7 @@ const MainPage = () => {
     setTileColors({});
   };
 
-  // when mouse cursor moves 
+  // when mouse cursor moves
   const handleMouseMove = (event) => {
     if (!startTile) return;
 
@@ -195,42 +197,47 @@ const MainPage = () => {
     const endRow = Math.floor(offsetY / tileSize);
 
     const selected = [];
-    for (let row = Math.min(startTile.row, endRow); row <= Math.max(startTile.row, endRow); row++) {
-      for (let column = Math.min(startTile.column, endColumn); column <= Math.max(startTile.column, endColumn); column++) {
+    for (
+      let row = Math.min(startTile.row, endRow);
+      row <= Math.max(startTile.row, endRow);
+      row++
+    ) {
+      for (
+        let column = Math.min(startTile.column, endColumn);
+        column <= Math.max(startTile.column, endColumn);
+        column++
+      ) {
         selected.push({ column, row });
       }
     }
 
     setSelectedTiles(selected);
-    const uniqueColumnsY = [...new Set(selected.map(q => q.row))];
-    const uniqueRowsX = [...new Set(selected.map(q => q.column))];
-
+    const uniqueColumnsY = [...new Set(selected.map((q) => q.row))];
+    const uniqueRowsX = [...new Set(selected.map((q) => q.column))];
 
     // data to take in metadata
     set_IniNFTCord(selectedTiles[0]);
-    console.log({ startTile: selectedTiles[0] })
-    console.log({ EndTile: selectedTiles[selectedTiles.length - 1] })
+    console.log({ startTile: selectedTiles[0] });
+    console.log({ EndTile: selectedTiles[selectedTiles.length - 1] });
 
     set_nftHeight(uniqueColumnsY.length * 10);
-    console.log({ SelectedHeightY: uniqueColumnsY.length * 10 })
+    console.log({ SelectedHeightY: uniqueColumnsY.length * 10 });
 
     set_nftWidth(uniqueRowsX.length * 10);
-    console.log({ SelectedWidthX: uniqueRowsX.length * 10 })
-
+    console.log({ SelectedWidthX: uniqueRowsX.length * 10 });
 
     if (selectedTiles.length > 100) {
       const updatedColors = {};
       selected.forEach((tile) => {
         const tileKey = `${tile.column}-${tile.row}`;
-        updatedColors[tileKey] = 'red';
+        updatedColors[tileKey] = "red";
       });
       setTileColors(updatedColors);
-    }
-    else {
+    } else {
       const updatedColors = {};
       selected.forEach((tile) => {
         const tileKey = `${tile.column}-${tile.row}`;
-        updatedColors[tileKey] = 'gold';
+        updatedColors[tileKey] = "gold";
       });
       setTileColors(updatedColors);
     }
