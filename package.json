@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@air/react-drag-to-select": "^5.0.8",
     "@onflow/fcl": "^1.4.1",
     "@onflow/types": "^1.1.0",
     "@thirdweb-dev/storage": "^1.1.6",

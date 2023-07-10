@@ -3,23 +3,27 @@ import React, { useEffect, useRef, useState } from "react";
 import * as fcl from "@onflow/fcl";
 import * as t from "@onflow/types";
 import { ThirdwebStorage } from "@thirdweb-dev/storage";
-
 import { mintNFT } from "../../cadence/transactions/mint_nfts.js";
 import { setupUserTx } from "../../cadence/transactions/setup_user.js";
 
 import { getNFTs } from "../../cadence/scripts/get_nfts.js";
 
 const GameComponent = () => {
+  const [selectionBox, setSelectionBox] = useState();
+  const [selectedIndexes, setSelectedIndexes] = useState([]);
+  const selectableItems = useRef([]);
+  const elementsContainerRef = useRef(null);
+
   const storage = new ThirdwebStorage();
 
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
   const [file, set_file] = useState();
   const [selected_pixels, set_selected_pixels] = useState();
-  fcl
-    .config()
-    .put("accessNode.api", " https://rest-testnet.onflow.org")
-    .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
+  // fcl
+  //   .config()
+  //   .put("accessNode.api", " https://rest-testnet.onflow.org")
+  //   .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
 
   const logIn = () => {
     fcl.authenticate();
@@ -27,14 +31,12 @@ const GameComponent = () => {
 
   useEffect(() => {
     //sets user to logged in user
-
-    fcl.currentUser().subscribe(set_user);
+    // fcl.currentUser().subscribe(set_user);
   }, []);
 
   useEffect(() => {
     // if (!user?.addr) return;
-
-    getUserNFTs();
+    // getUserNFTs();
   }, [user?.addr]);
 
   const getUserNFTs = async () => {
@@ -112,7 +114,9 @@ const GameComponent = () => {
     if (!isTileSelected) {
       setSelectedTiles([...selectedTiles, { x: tileX, y: tileY }]);
     }
+
     console.log({ clickSelect: selectedTiles });
+    setSelectedIndexes(selectedTiles);
     set_selected_pixels(selectedTiles);
   };
 
@@ -180,6 +184,20 @@ const GameComponent = () => {
     renderCanvas();
   }, [selectedTiles]);
 
+  useEffect(() => {
+    if (elementsContainerRef.current) {
+      Array.from(elementsContainerRef.current.children).forEach((item) => {
+        const { left, top, width, height } = item.getBoundingClientRect();
+        selectableItems.current.push({
+          left,
+          top,
+          width,
+          height,
+        });
+      });
+    }
+  }, []);
+
   return (
     <>
       <div>
@@ -204,7 +222,7 @@ const GameComponent = () => {
         </div>
         <div>all nfts </div>
       </div>
-      <div style={{ backgroundColor: "black" }}>
+      <div ref={elementsContainerRef} style={{ backgroundColor: "black" }}>
         <canvas
           ref={canvasRef}
           onClick={handleTileClick}
