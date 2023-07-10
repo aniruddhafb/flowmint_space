@@ -64,12 +64,10 @@ const MainPage = () => {
 
   // getting all users nfts
   const getUserNFTs = async () => {
-    const result = await fcl
-      .send([
-        fcl.script(getNFTs),
-        fcl.args([fcl.arg("0xae768da09c4cec20", t.Address)]),
-      ])
-      .then(fcl.decode);
+    const result = await fcl.send([
+      fcl.script(getNFTs),
+      fcl.args([fcl.arg("0xae768da09c4cec20", t.Address)]),
+    ]).then(fcl.decode);
     console.log({ result });
   };
 
@@ -270,7 +268,7 @@ const MainPage = () => {
         </div>
 
         {myNFTs &&
-          <div style={{ height: "91vh", width: "400px", border: "2px solid #7000ff" }} className="fixed right-0 top-[60px] py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] shadow-xl" >
+          <div style={{ height: "91vh", width: "400px", border: "2px solid #7000ff" }} className="fixed right-0 top-[60px] py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] shadow-xl z-20" >
             <button
               type="button"
               className="btn-close"
@@ -306,9 +304,10 @@ const MainPage = () => {
 
         {isMintingModal && (
           <>
-            <div className="backdrop-blur-lg absolute w-[100%] h-[200%] z-10"></div>
+            <div className="backdrop-blur-lg fixed w-[100%] h-[200%] z-10"></div>
             <div
-              className="absolute py-2 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl z-50"
+              className="fixed py-2 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl z-50"
+              id="transformMod"
               style={{ border: "6px solid #7000ff" }}
             >
               <div style={{ padding: "20px 40px" }}>
