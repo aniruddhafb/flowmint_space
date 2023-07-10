@@ -18,6 +18,9 @@ const MainPage = () => {
   const [nft_name, set_nft_name] = useState("");
   const [nft_link, set_nft_link] = useState("");
   const [nft_cost, set_nft_cost] = useState("");
+  const [nft_iniNFTCord, set_IniNFTCord] = useState("");
+  const [nftHeight, set_nftHeight] = useState("");
+  const [nftWidth, set_nftWidth] = useState("");
   const [file, set_file] = useState();
 
   const [isMintingModal, setIsMinting] = useState(false);
@@ -25,7 +28,11 @@ const MainPage = () => {
 
   const canvasRef = useRef(null);
   const [selectedTiles, setSelectedTiles] = useState([]);
+  const [startTile, setStartTile] = useState(null);
+  const [tileColors, setTileColors] = useState({});
   const tileSize = 10;
+  const numColumns = 100;
+  const numRows = 100;
 
   fcl
     .config()
@@ -117,40 +124,6 @@ const MainPage = () => {
     setNFTMinting(false);
   };
 
-  // Function to handle tile selection
-  const handleTileClick = (event) => {
-    const tileX = Math.floor(event.nativeEvent.offsetX / tileSize);
-    const tileY = Math.floor(event.nativeEvent.offsetY / tileSize);
-
-    const isTileSelected = selectedTiles.some(
-      (tile) => tile.x === tileX && tile.y === tileY
-    );
-
-    if (!isTileSelected) {
-      setSelectedTiles([...selectedTiles, { x: tileX, y: tileY }]);
-    }
-    console.log({ clickSelect: selectedTiles });
-  };
-
-  // Function to handle dragging and selecting multiple tiles
-  const handleTileDrag = (event) => {
-    if (event.buttons === 1) {
-      const tileX = Math.floor(event.nativeEvent.offsetX / tileSize);
-      const tileY = Math.floor(event.nativeEvent.offsetY / tileSize);
-
-      // Checking if the dragged tile is already selected
-      const isTileSelected = selectedTiles.some(
-        (tile) => tile.x === tileX && tile.y === tileY
-      );
-
-      // If the tile is not already selected, add it to the selectedTiles array
-      if (!isTileSelected) {
-        setSelectedTiles([...selectedTiles, { x: tileX, y: tileY }]);
-      }
-      console.log({ dragSelect: selectedTiles });
-    }
-  };
-
   // rendering nft images
   const renderImages = () => {
     const canvas = canvasRef.current;
@@ -182,26 +155,92 @@ const MainPage = () => {
     });
   };
 
-  // handling calcuating selected canvas pixels
-  const calculateSelectedCanvas = () => {};
-
-  // Function to render the canvas
-  const renderSelectedCanvas = () => {
+  // coloring the canvas
+  useEffect(() => {
+    renderImages();
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
-    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let y = 0; y < numRows; y++) {
+      for (let x = 0; x < numColumns; x++) {
+        const tileKey = `${x}-${y}`;
+        const color = tileColors[tileKey] || '#21004b';
+        ctx.fillStyle = color;
+        ctx.strokeStyle = "#7000ff";
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
+      }
+    }
+  }, [tileColors]);
 
-    selectedTiles.forEach((tile) => {
-      const { x, y } = tile;
-      ctx.fillStyle = "gold";
-      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-    });
+
+  // when mouse cursor is triggered
+  const handleMouseDown = (event) => {
+    const { offsetX, offsetY } = event.nativeEvent;
+    const startColumn = Math.floor(offsetX / tileSize);
+    const startRow = Math.floor(offsetY / tileSize);
+    setStartTile({ column: startColumn, row: startRow });
+    setTileColors({});
   };
 
-  useEffect(() => {
-    renderSelectedCanvas();
-  }, [selectedTiles]);
+  // when mouse cursor moves 
+  const handleMouseMove = (event) => {
+    if (!startTile) return;
+
+    const { offsetX, offsetY } = event.nativeEvent;
+    const endColumn = Math.floor(offsetX / tileSize);
+    const endRow = Math.floor(offsetY / tileSize);
+
+    const selected = [];
+    for (let row = Math.min(startTile.row, endRow); row <= Math.max(startTile.row, endRow); row++) {
+      for (let column = Math.min(startTile.column, endColumn); column <= Math.max(startTile.column, endColumn); column++) {
+        selected.push({ column, row });
+      }
+    }
+
+    setSelectedTiles(selected);
+    const uniqueColumnsY = [...new Set(selected.map(q => q.row))];
+    const uniqueRowsX = [...new Set(selected.map(q => q.column))];
+
+
+    // data to take in metadata
+    set_IniNFTCord(selectedTiles[0]);
+    console.log({ startTile: selectedTiles[0] })
+    console.log({ EndTile: selectedTiles[selectedTiles.length - 1] })
+
+    set_nftHeight(uniqueColumnsY.length * 10);
+    console.log({ SelectedHeightY: uniqueColumnsY.length * 10 })
+
+    set_nftWidth(uniqueRowsX.length * 10);
+    console.log({ SelectedWidthX: uniqueRowsX.length * 10 })
+
+
+    if (selectedTiles.length > 100) {
+      const updatedColors = {};
+      selected.forEach((tile) => {
+        const tileKey = `${tile.column}-${tile.row}`;
+        updatedColors[tileKey] = 'red';
+      });
+      setTileColors(updatedColors);
+    }
+    else {
+      const updatedColors = {};
+      selected.forEach((tile) => {
+        const tileKey = `${tile.column}-${tile.row}`;
+        updatedColors[tileKey] = 'gold';
+      });
+      setTileColors(updatedColors);
+    }
+  };
+
+  // when mouse cursor is released
+  const handleMouseUp = () => {
+    setStartTile(null);
+    if (selectedTiles.length > 100) {
+      setTileColors({});
+      setSelectedTiles([]);
+    }
+  };
 
   return (
     <>
@@ -221,8 +260,9 @@ const MainPage = () => {
         <div>
           <canvas
             ref={canvasRef}
-            onClick={handleTileClick}
-            onMouseMove={handleTileDrag}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
             width={1000}
             height={1000}
           />
