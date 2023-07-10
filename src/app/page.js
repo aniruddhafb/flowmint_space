@@ -146,8 +146,14 @@ const MainPage = () => {
       // If the tile is not already selected, add it to the selectedTiles array
       if (!isTileSelected) {
         setSelectedTiles([...selectedTiles, { x: tileX, y: tileY }]);
+        if (tileX === tileX + 1 || tileX === tileX - 1) {
+          console.log("ok");
+        } else {
+          console.log("wrong");
+          console.log(tileX);
+        }
       }
-      console.log({ dragSelect: selectedTiles });
+      // console.log({ dragSelect: selectedTiles });
     }
   };
 
