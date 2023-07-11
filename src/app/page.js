@@ -83,7 +83,6 @@ const MainPage = () => {
       ])
       .then(fcl.decode);
 
-    console.log(transactionId);
     return fcl.tx(transactionId).onceSealed();
   };
 
@@ -133,9 +132,6 @@ const MainPage = () => {
         },
       });
 
-      console.log(save_coordinate.data);
-
-      console.log(txn_id);
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -159,7 +155,7 @@ const MainPage = () => {
     // Loop through the images array and load each image
     result.forEach((e) => {
       const nft_info = JSON.parse(e.metadata.name);
-      console.log({ nftInfo: nft_info });
+
       const imageObj = new Image();
       imageObj.src = nft_info.ipfs_hash.replace(
         "ipfs://",
@@ -228,20 +224,34 @@ const MainPage = () => {
       }
     }
 
+    // shravan change
+    let lowest_col;
+    let lowest_row;
+    let new_arr = [];
+    for (let i = 0; i < selected.length; i++) {
+      lowest_col =
+        selected[i]["column"] > selected[i]["column"] + 1
+          ? selected[i]["column"] + 1
+          : selected[i]["column"];
+      lowest_row =
+        selected[i]["row"] > selected[i]["row"] + 1
+          ? selected[i]["row"] + 1
+          : selected[i]["row"];
+
+      new_arr.push({ column: lowest_col, row: lowest_row });
+    }
+    console.log(new_arr);
+
     setSelectedTiles(selected);
     const uniqueColumnsY = [...new Set(selected.map((q) => q.row))];
     const uniqueRowsX = [...new Set(selected.map((q) => q.column))];
 
     // data to take in metadata
     set_IniNFTCord(selectedTiles[0]);
-    console.log({ startTile: selectedTiles[0] });
-    console.log({ EndTile: selectedTiles[selectedTiles.length - 1] });
 
     set_nftHeight(uniqueColumnsY.length * 10);
-    console.log({ SelectedHeightY: uniqueColumnsY.length * 10 });
 
     set_nftWidth(uniqueRowsX.length * 10);
-    console.log({ SelectedWidthX: uniqueRowsX.length * 10 });
 
     if (selectedTiles.length > 100) {
       const updatedColors = {};
