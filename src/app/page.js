@@ -28,7 +28,8 @@ const MainPage = () => {
 
   const canvasRef = useRef(null);
   const [selectedTiles, setSelectedTiles] = useState([]);
-  const [allNFTs, setAllNFTs] = useState([]);
+  const [allWalletNFTs, setAllWalletNFTs] = useState([]);
+  const [allContractNFTs, setContractNFTs] = useState([]);
   const [startTile, setStartTile] = useState(null);
   const [tileColors, setTileColors] = useState({});
   const tileSize = 10;
@@ -60,12 +61,12 @@ const MainPage = () => {
     renderImages()
   }, [user?.addr]);
 
-  // getting all users nfts
+  // getting all users nfts from wallet
   const getUserNFTs = async () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    setAllNFTs(result);
+    setAllWalletNFTs(result);
   };
 
   // setting up a collection for user 
@@ -128,11 +129,10 @@ const MainPage = () => {
   // rendering nft images and fetching
   const renderImages = async () => {
     if (!user?.addr) return;
-    // fetching nfts 
+    // fetching nfts from wallet later do it from collection
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    setAllNFTs(result);
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
