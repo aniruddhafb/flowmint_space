@@ -58,3 +58,9 @@ canvas {
   background-size: 10px 10px;
   background-color: #21004b;
 }
+
+#transformMod {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

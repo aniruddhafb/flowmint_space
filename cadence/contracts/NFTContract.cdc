@@ -10,7 +10,7 @@ pub contract MyNFT: NonFungibleToken{
     pub event Withdraw(id: UInt64, from: Address?)
 
     pub event Deposit(id: UInt64, to: Address?)
-    
+
     pub resource NFT: NonFungibleToken.INFT{
         pub let id: UInt64
         pub let ipfsHash: String

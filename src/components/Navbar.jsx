@@ -4,16 +4,14 @@ import Link from "next/link";
 import defaultAvatar from "../../public/avatar.png";
 import webLogo from "../../public/whitefav.png";
 
-const Navbar = ({ userAddress, logIn, logOut }) => {
+const Navbar = ({ userAddress, logIn, logOut, setMyNFTs }) => {
 
     const [showProfile, SetShowProfile] = useState(false);
-    const [myNFTs, setMyNFTs] = useState(false);
     const [navDropDown, setnavDropDown] = useState(true);
 
     return (
         <nav
-            x-data="{ isOpen: false }"
-            className="relative bg-[#21004b] shadow"
+            className="sticky top-0 bg-[#21004b] shadow"
         >
             <div className="container px-6 py-4 mx-auto">
                 <div className="lg:flex lg:items-center lg:justify-between">
@@ -59,9 +57,7 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
 
                     {/* navbar drop down  */}
                     {navDropDown ? (
-                        <div className="absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-[#21004b] lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
-
-
+                        <div className="absolute inset-x-0 z-10 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-[#21004b] lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
                             {userAddress ? (
                                 <div className="flex flex-row">
                                     <div className="relative flex items-center mt-4 lg:mt-0">
@@ -88,7 +84,7 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
                                         </button>
 
                                         {showProfile && (
-                                            <div className="absolute left-[5%] top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
+                                            <div className="absolute right-[1%] top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
                                                 <a
                                                     href="#"
                                                     rel="noreferrer"
@@ -154,29 +150,6 @@ const Navbar = ({ userAddress, logIn, logOut }) => {
 
                                                     <span className="mx-1">Sign Out</span>
                                                 </a>
-                                            </div>
-                                        )}
-                                        {myNFTs && (
-                                            <div style={{ height: "80vh", width: "400px" }} className="absolute top-11 w-56 py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl">
-                                                <button
-                                                    type="button"
-                                                    className="btn-close"
-                                                    data-bs-dismiss="modal"
-                                                    aria-label="Close"
-                                                    onClick={() => (SetShowProfile(false), setMyNFTs(false))}
-                                                    style={{ position: "absolute", right: "5px" }}
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 24 24"
-                                                        width="24"
-                                                        height="24"
-                                                        className="h-6 w-6 fill-jacarta-700 dark:fill-white"
-                                                    >
-                                                        <path fill="none" d="M0 0h24v24H0z" />
-                                                        <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
-                                                    </svg>
-                                                </button>
                                             </div>
                                         )}
                                     </div>
