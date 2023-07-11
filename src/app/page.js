@@ -11,6 +11,8 @@ import { getNFTs } from "../../cadence/scripts/get_nfts.js";
 import Footer from "@/components/Footer.jsx";
 import Navbar from "@/components/Navbar.jsx";
 import axios from "axios";
+// import Image from "next/image.js";
+import defaultAvatar from "../../public/avatar.png";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
@@ -57,17 +59,39 @@ const MainPage = () => {
     fcl.currentUser().subscribe(set_user);
   }, []);
 
-  // getting nfts and rendering it
+  // updating the canvas frequently on select
   useEffect(() => {
+    renderImages();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    for (let y = 0; y < numRows; y++) {
+      for (let x = 0; x < numColumns; x++) {
+        const tileKey = `${x}-${y}`;
+        const color = tileColors[tileKey] || "#21004b";
+        ctx.fillStyle = color;
+        ctx.strokeStyle = "#7000ff";
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
+      }
+    }
+  }, [tileColors]);
+
+
+  // getting nfts and rendering it initially
+  useEffect(() => {
+    // getUserNFTs();
     renderImages();
   }, [user?.addr]);
 
   // getting all users nfts from wallet
   const getUserNFTs = async () => {
+    if (!user?.addr) return;
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
     setAllWalletNFTs(result);
+    renderImages();
   };
 
   // setting up a collection for user
@@ -152,6 +176,7 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
+    setAllWalletNFTs(result);
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -159,7 +184,6 @@ const MainPage = () => {
     // Loop through the images array and load each image
     result.forEach((e) => {
       const nft_info = JSON.parse(e.metadata.name);
-      console.log({ nftInfo: nft_info });
       const imageObj = new Image();
       imageObj.src = nft_info.ipfs_hash.replace(
         "ipfs://",
@@ -177,24 +201,6 @@ const MainPage = () => {
       };
     });
   };
-
-  // coloring the canvas
-  useEffect(() => {
-    renderImages();
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    for (let y = 0; y < numRows; y++) {
-      for (let x = 0; x < numColumns; x++) {
-        const tileKey = `${x}-${y}`;
-        const color = tileColors[tileKey] || "#21004b";
-        ctx.fillStyle = color;
-        ctx.strokeStyle = "#7000ff";
-        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-        ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
-      }
-    }
-  }, [tileColors]);
 
   // when mouse cursor is triggered
   const handleMouseDown = (event) => {
@@ -330,6 +336,21 @@ const MainPage = () => {
                 <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
               </svg>
             </button>
+
+            <div className="max-w-sm rounded overflow-hidden shadow-2xl">
+              <img className="w-[100%] h-[200px] p-[10px]" src="avatar.png" height={100} width={100} />
+              <div className="px-6 py-4">
+                <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
+                <p className="text-gray-400 text-base">
+                  block.com
+                </p>
+              </div>
+              <div className="px-6 pt-4 pb-2">
+                <a href="#" target="_blank">
+                  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">View on explorer 🡥</span>
+                </a>
+              </div>
+            </div>
           </div>
         )}
 
