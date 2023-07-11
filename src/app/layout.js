@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
           content="Flowmint platform is an revolutionary approach for advertising and self-expression using NFTs"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/fav.png" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <body className={inter.className}>{children}</body>
