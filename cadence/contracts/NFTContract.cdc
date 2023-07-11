@@ -3,15 +3,14 @@ import NonFungibleToken from 0x631e88ae7f1d7c20
 pub contract MyNFT: NonFungibleToken{
     
     pub var totalSupply: UInt64
-    pub var coordinatesId: UInt64
-    pub var reserved_coordinates: {UInt64: String}
+    pub var reserved_coordinates: [String]
     
     pub event ContractInitialized()
     
     pub event Withdraw(id: UInt64, from: Address?)
 
     pub event Deposit(id: UInt64, to: Address?)
-
+    
     pub resource NFT: NonFungibleToken.INFT{
         pub let id: UInt64
         pub let ipfsHash: String
@@ -67,20 +66,22 @@ pub contract MyNFT: NonFungibleToken{
         }
     }
 
+    pub fun get_coordinates(): [String]{
+        return self.reserved_coordinates
+    }
+
     pub fun createEmptyCollection():@Collection{
         return <- create Collection()
     }
 
     pub fun createToken(ipfsHash: String, metadata: {String: String}, token_coordinate: String): @MyNFT.NFT{
-        self.reserved_coordinates[self.coordinatesId] = token_coordinate
-        self.coordinatesId = self.coordinatesId + 1
+    self.reserved_coordinates.append(token_coordinate)
         return <- create NFT(_ipfsHash: ipfsHash, _metadata: metadata)
     }
 
     init(){
         self.totalSupply = 0
-        self.coordinatesId = 0
-        self.reserved_coordinates = {} 
+        self.reserved_coordinates = []
     }
 
 }

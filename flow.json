@@ -16,13 +16,13 @@
       "key": "3bb22545881423eb7269a8983f01d4d48652be549f36746e301226aa1732cba3"
     },
     "shravan": {
-      "address": "0xcd355bc6287d783d",
-      "key": "c6525ee021a649bdee26a085a63dacd00acc575de0d816ad5a8b146f6bef8718"
+      "address": "0xbdcf8c2d966d8ac9",
+      "key": "dfb5af84389cabccceafa0792545c19c27e966b7047a0e65bfff9d928936575b"
     }
   },
   "deployments": {
     "testnet": {
-      "shravan": ["marketplace"]
+      "shravan": ["marketplace", "nft_contract"]
     }
   }
 }

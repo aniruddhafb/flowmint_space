@@ -64,17 +64,13 @@ const MainPage = () => {
   // getting all users nfts
   const getUserNFTs = async () => {
     const result = await fcl
-      .send([
-        fcl.script(getNFTs),
-        fcl.args([fcl.arg("0xcd355bc6287d783d", t.Address)]),
-        // fcl.args([fcl.arg("0xae768da09c4cec20", t.Address)]),
-      ])
+      .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
     console.log({ result });
   };
 
   const setupUser = async () => {
-    const txn_id = await fcl
+    const transactionId = await fcl
       .send([
         fcl.transaction(setupUserTx),
         fcl.args([]),
@@ -85,9 +81,8 @@ const MainPage = () => {
       ])
       .then(fcl.decode);
 
-    console.log(txn_id);
-
-    return fcl.tx(txn_id).onceSealed();
+    console.log(transactionId);
+    return fcl.tx(transactionId).onceSealed();
   };
 
   // minting nft segment
@@ -96,8 +91,8 @@ const MainPage = () => {
     try {
       const ipfs_hash = await storage.upload(file);
       const nft_data = JSON.stringify({
-        ipfs_hash,
-        nft_name,
+        ipfs_hash: "",
+        nft_name: "",
         selectedTiles,
       });
 
@@ -108,7 +103,11 @@ const MainPage = () => {
       const txn_id = await fcl
         .send([
           fcl.transaction(mintNFT),
-          fcl.args([fcl.arg(ipfs_hash, t.String), fcl.arg(nft_data, t.String)]),
+          fcl.args([
+            fcl.arg(ipfs_hash, t.String),
+            fcl.arg(nft_data, t.String),
+            fcl.arg(JSON.stringify(selectedTiles), t.String),
+          ]),
           fcl.payer(fcl.authz),
           fcl.proposer(fcl.authz),
           fcl.authorizations([fcl.authz]),
@@ -120,7 +119,8 @@ const MainPage = () => {
       getUserNFTs();
       return fcl.tx(txn_id).onceSealed();
     } catch (error) {
-      console.log("Error uploading image to ipfs");
+      console.log(error.message);
+      // console.log("Error uploading image to ipfs");
     }
     setNFTMinting(false);
   };
@@ -250,6 +250,7 @@ const MainPage = () => {
   return (
     <>
       <Navbar userAddress={user?.addr} logIn={logIn} logOut={logOut} />
+      <button onClick={() => setupUser()}>setup user</button>
 
       <div
         style={{
@@ -276,7 +277,10 @@ const MainPage = () => {
         {selectedTiles != "" && (
           <div style={{ marginTop: "30px" }}>
             <button
-              onClick={() => setIsMinting(true)}
+              onClick={() => {
+                // setIsMinting(true);
+                mint();
+              }}
               className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
             >
               Mint Segment
