@@ -262,6 +262,7 @@ const MainPage = () => {
         setMyNFTs={setMyNFTs}
         myNFTs={myNFTs}
       />
+      <button onClick={setupUser}>setup user</button>
 
       <div
         style={{
