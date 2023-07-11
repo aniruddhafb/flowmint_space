@@ -10,6 +10,7 @@ import { setupUserTx } from "../../cadence/transactions/setup_user.js";
 import { getNFTs } from "../../cadence/scripts/get_nfts.js";
 import Footer from "@/components/Footer.jsx";
 import Navbar from "@/components/Navbar.jsx";
+import axios from "axios";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
@@ -58,7 +59,7 @@ const MainPage = () => {
 
   // getting nfts and rendering it
   useEffect(() => {
-    renderImages()
+    renderImages();
   }, [user?.addr]);
 
   // getting all users nfts from wallet
@@ -69,7 +70,7 @@ const MainPage = () => {
     setAllWalletNFTs(result);
   };
 
-  // setting up a collection for user 
+  // setting up a collection for user
   const setupUser = async () => {
     const transactionId = await fcl
       .send([
@@ -116,6 +117,24 @@ const MainPage = () => {
         ])
         .then(fcl.decode);
 
+      const save_nft = await axios({
+        url: "/api/nft",
+        method: "POST",
+        data: {
+          metadata: nft_data,
+        },
+      });
+
+      const save_coordinate = await axios({
+        url: "/api/coordinates",
+        method: "POST",
+        data: {
+          new_coordinate: JSON.stringify(selectedTiles),
+        },
+      });
+
+      console.log(save_coordinate.data);
+
       console.log(txn_id);
       setTimeout(() => {
         window.location.reload();
@@ -140,7 +159,7 @@ const MainPage = () => {
     // Loop through the images array and load each image
     result.forEach((e) => {
       const nft_info = JSON.parse(e.metadata.name);
-      console.log({ nftInfo: nft_info })
+      console.log({ nftInfo: nft_info });
       const imageObj = new Image();
       imageObj.src = nft_info.ipfs_hash.replace(
         "ipfs://",

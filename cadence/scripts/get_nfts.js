@@ -7,7 +7,7 @@ pub fun main(account: Address): [&MyNFT.NFT]{
     let collection = getAccount(account).getCapability(/public/MyNFTCollection)
                         .borrow<&MyNFT.Collection{NonFungibleToken.CollectionPublic, MyNFT.CollectionPublic}>()
                         ?? panic("can't get the users collection")
-
+                        
     let returnVals: [&MyNFT.NFT] = []
     let ids = collection.getIDs()
     for id in ids {
