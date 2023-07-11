@@ -13,7 +13,6 @@ import Navbar from "@/components/Navbar.jsx";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
-
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
   const [nft_link, set_nft_link] = useState("");
@@ -29,6 +28,7 @@ const MainPage = () => {
 
   const canvasRef = useRef(null);
   const [selectedTiles, setSelectedTiles] = useState([]);
+  const [allNFTs, setAllNFTs] = useState([]);
   const [startTile, setStartTile] = useState(null);
   const [tileColors, setTileColors] = useState({});
   const tileSize = 10;
@@ -53,13 +53,11 @@ const MainPage = () => {
   //sets user to logged in user
   useEffect(() => {
     fcl.currentUser().subscribe(set_user);
-    renderImages();
   }, []);
 
-  // getting nfts
+  // getting nfts and rendering it
   useEffect(() => {
-    if (!user?.addr) return;
-    getUserNFTs();
+    renderImages()
   }, [user?.addr]);
 
   // getting all users nfts
@@ -67,9 +65,10 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    console.log({ result });
+    setAllNFTs(result);
   };
 
+  // setting up a collection for user 
   const setupUser = async () => {
     const transactionId = await fcl
       .send([
@@ -88,7 +87,6 @@ const MainPage = () => {
 
   // minting nft segment
   const mint = async () => {
-    // e.preventDefault();
     setNFTMinting(true);
     try {
       const ipfs_hash = await storage.upload(file);
@@ -101,10 +99,6 @@ const MainPage = () => {
         nftHeight,
         nftWidth,
       });
-
-      // const added = await client.add(file);
-      // const hash = added.path;
-      // console.log(hash);
 
       const txn_id = await fcl
         .send([
@@ -122,41 +116,44 @@ const MainPage = () => {
         .then(fcl.decode);
 
       console.log(txn_id);
-      getUserNFTs();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       return fcl.tx(txn_id).onceSealed();
     } catch (error) {
       console.log(error.message);
-      // console.log("Error uploading image to ipfs");
     }
-    setNFTMinting(false);
   };
 
-  // rendering nft images
-  const renderImages = () => {
+  // rendering nft images and fetching
+  const renderImages = async () => {
+    if (!user?.addr) return;
+    // fetching nfts 
+    const result = await fcl
+      .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
+      .then(fcl.decode);
+    setAllNFTs(result);
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    const images = [
-      { src: "../logo_bg.png", x: 25, y: 10 },
-      { src: "../logo_bg.png", x: 91, y: 70 },
-    ];
-
-    // Set the desired width and height for each image
-    const imageWidth = 50;
-    const imageHeight = 50;
-
     // Loop through the images array and load each image
-    images.forEach((imageData) => {
+    result.forEach((e) => {
+      const nft_info = JSON.parse(e.metadata.name);
+      console.log({ nftInfo: nft_info })
       const imageObj = new Image();
-      imageObj.src = imageData.src;
+      imageObj.src = nft_info.ipfs_hash.replace(
+        "ipfs://",
+        "https://ipfs.io/ipfs/"
+      );
 
       imageObj.onload = () => {
         ctx.drawImage(
           imageObj,
-          imageData.x * 10,
-          imageData.y * 10,
-          imageWidth,
-          imageHeight
+          nft_info.nft_iniNFTCord.row * 10,
+          nft_info.nft_iniNFTCord.column * 10,
+          nft_info.nftWidth,
+          nft_info.nftHeight
         );
       };
     });
@@ -262,7 +259,7 @@ const MainPage = () => {
         setMyNFTs={setMyNFTs}
         myNFTs={myNFTs}
       />
-      <button onClick={setupUser}>setup user</button>
+      {/* <button onClick={setupUser}>setup user</button> */}
 
       <div
         style={{
