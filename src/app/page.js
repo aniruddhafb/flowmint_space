@@ -16,7 +16,6 @@ import defaultAvatar from "../../public/avatar.png";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
-  const [mouse_movement, set_mouse_movement] = useState(false);
 
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
@@ -63,9 +62,7 @@ const MainPage = () => {
 
   // updating the canvas frequently on select
   useEffect(() => {
-    if (!mouse_movement) {
-      renderImages();
-    }
+    renderImages();
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -231,7 +228,6 @@ const MainPage = () => {
 
   // when mouse cursor is triggered
   const handleMouseDown = (event) => {
-    set_mouse_movement(true);
     const { offsetX, offsetY } = event.nativeEvent;
     const startColumn = Math.floor(offsetX / tileSize);
     const startRow = Math.floor(offsetY / tileSize);
@@ -242,7 +238,6 @@ const MainPage = () => {
   // when mouse cursor moves
   const handleMouseMove = (event) => {
     if (!startTile) return;
-    set_mouse_movement(true);
 
     const { offsetX, offsetY } = event.nativeEvent;
     const endColumn = Math.floor(offsetX / tileSize);
@@ -310,7 +305,6 @@ const MainPage = () => {
 
   // when mouse cursor is released
   const handleMouseUp = () => {
-    set_mouse_movement(false);
     setStartTile(null);
     if (selectedTiles.length > 100) {
       setTileColors({});
