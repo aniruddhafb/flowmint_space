@@ -44,7 +44,7 @@ const MainPage = () => {
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
     .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
-
+  
   // login
   const logIn = () => {
     fcl.authenticate();
@@ -55,9 +55,19 @@ const MainPage = () => {
     fcl.unauthenticate();
   };
 
+  const get_reserved_coordinates = async () => {
+    const res = await axios({
+      url: "/api/coordinates",
+      method: "GET",
+    });
+
+    console.log(res.data.map((e) => JSON.parse(e.coordinates)));
+  };
+
   //sets user to logged in user
   useEffect(() => {
     fcl.currentUser().subscribe(set_user);
+    get_reserved_coordinates();
   }, []);
 
   // updating the canvas frequently on select
@@ -173,8 +183,6 @@ const MainPage = () => {
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
 
-    // console.log(result);
-
     setAllWalletNFTs(result);
 
     const canvas = canvasRef.current;
@@ -185,7 +193,6 @@ const MainPage = () => {
       method: "GET",
     });
     const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
-    console.log(parsed_data);
 
     // Loop through the images array and load each image
     parsed_data.forEach((e) => {

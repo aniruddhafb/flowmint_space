@@ -8,7 +8,7 @@ export async function GET(request) {
 
   const all_coordinates = await coordinates.find();
 
-  return new Response(all_coordinates);
+  return NextResponse.json(all_coordinates);
 }
 
 export async function POST(request) {
