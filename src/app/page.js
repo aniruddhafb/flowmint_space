@@ -44,7 +44,7 @@ const MainPage = () => {
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
     .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
-  
+
   // login
   const logIn = () => {
     fcl.authenticate();
@@ -92,6 +92,7 @@ const MainPage = () => {
   // getting nfts and rendering it initially
   useEffect(() => {
     renderImages();
+    getUserNFTs();
   }, [user?.addr]);
 
   // getting all users nfts from wallet
@@ -100,8 +101,8 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
+    console.log({ walletNFTs: result });
     setAllWalletNFTs(result);
-    renderImages();
   };
 
   // setting up a collection for user
@@ -177,22 +178,15 @@ const MainPage = () => {
 
   // rendering nft images and fetching
   const renderImages = async () => {
-    if (!user?.addr) return;
-    // fetching nfts from wallet later do it from collection
-    const result = await fcl
-      .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
-      .then(fcl.decode);
-
-    setAllWalletNFTs(result);
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
+    // fetching all nfts from mongo
     const res = await axios({
       url: "/api/nft",
       method: "GET",
     });
     const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
     // Loop through the images array and load each image
     parsed_data.forEach((e) => {
@@ -206,8 +200,8 @@ const MainPage = () => {
       imageObj.onload = () => {
         ctx.drawImage(
           imageObj,
-          nft_info.nft_iniNFTCord.row * 10,
           nft_info.nft_iniNFTCord.column * 10,
+          nft_info.nft_iniNFTCord.row * 10,
           nft_info.nftWidth,
           nft_info.nftHeight
         );
@@ -265,7 +259,7 @@ const MainPage = () => {
       }
     }
 
-    // shravan change
+    // finding the lowest cordinates to render image
     let lowest_col;
     let lowest_row;
     let new_arr = [];
@@ -280,6 +274,8 @@ const MainPage = () => {
           : selected[i]["row"];
 
       new_arr.push({ column: lowest_col, row: lowest_row });
+      console.log({ selectedTile: selected[0] });
+      console.log({ SelectedTileOrdered: new_arr[0] });
     }
 
     setSelectedTiles(selected);
@@ -287,7 +283,7 @@ const MainPage = () => {
     const uniqueRowsX = [...new Set(selected.map((q) => q.column))];
 
     // data to take in metadata
-    set_IniNFTCord(selectedTiles[0]);
+    set_IniNFTCord(new_arr[0]);
 
     set_nftHeight(uniqueColumnsY.length * 10);
 
@@ -316,6 +312,9 @@ const MainPage = () => {
     if (selectedTiles.length > 100) {
       setTileColors({});
       setSelectedTiles([]);
+      set_IniNFTCord("");
+      set_nftWidth("");
+      set_nftHeight("");
     }
   };
 
@@ -381,25 +380,27 @@ const MainPage = () => {
               </svg>
             </button>
 
-            <div className="max-w-sm rounded overflow-hidden shadow-2xl">
-              <img
-                className="w-[100%] h-[200px] p-[10px]"
-                src="avatar.png"
-                height={100}
-                width={100}
-              />
-              <div className="px-6 py-4">
-                <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
-                <p className="text-gray-400 text-base">block.com</p>
-              </div>
-              <div className="px-6 pt-4 pb-2">
-                <a href="#" target="_blank">
-                  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                    View on explorer 🡥
-                  </span>
-                </a>
-              </div>
-            </div>
+            {allWalletNFTs?.map((e) => {
+              <div className="max-w-sm rounded overflow-hidden shadow-2xl">
+                <img
+                  className="w-[100%] h-[200px] p-[10px]"
+                  src="avatar.png"
+                  height={100}
+                  width={100}
+                />
+                <div className="px-6 py-4">
+                  <div className="font-bold text-xl mb-2">{e.id}</div>
+                  <p className="text-gray-400 text-base">{e.ipfsHash}</p>
+                </div>
+                <div className="px-6 pt-4 pb-2">
+                  <a href="#" target="_blank">
+                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                      View on explorer 🡥
+                    </span>
+                  </a>
+                </div>
+              </div>;
+            })}
           </div>
         )}
 
