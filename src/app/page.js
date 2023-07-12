@@ -13,10 +13,12 @@ import Navbar from "@/components/Navbar.jsx";
 import axios from "axios";
 // import Image from "next/image.js";
 import defaultAvatar from "../../public/avatar.png";
+import Loader from "@/components/Loader.jsx";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
 
+  const [reserved_coordinates, set_reserved_coordinates] = useState([]);
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
   const [nft_link, set_nft_link] = useState("");
@@ -29,17 +31,19 @@ const MainPage = () => {
   const [isMintingModal, setIsMinting] = useState(false);
   const [isNFTMinting, setNFTMinting] = useState(false);
   const [myNFTs, setMyNFTs] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const canvasRef = useRef(null);
   const [selectedTiles, setSelectedTiles] = useState([]);
   const [allWalletNFTs, setAllWalletNFTs] = useState([]);
-  const [allContractNFTs, setContractNFTs] = useState([]);
+  const [allMongoNFTs, setAllMongoNFTs] = useState([]);
   const [startTile, setStartTile] = useState(null);
   const [tileColors, setTileColors] = useState({});
   const tileSize = 10;
   const numColumns = 100;
   const numRows = 100;
-  
+
   fcl
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
@@ -48,6 +52,7 @@ const MainPage = () => {
   // login
   const logIn = () => {
     fcl.authenticate();
+    setLoggedIn(true);
   };
 
   // logout
@@ -55,19 +60,19 @@ const MainPage = () => {
     fcl.unauthenticate();
   };
 
+  // getting all reserved cordinates
   const get_reserved_coordinates = async () => {
     const res = await axios({
       url: "/api/coordinates",
       method: "GET",
     });
-
-    console.log(res.data.map((e) => JSON.parse(e.coordinates)));
   };
 
   //sets user to logged in user
   useEffect(() => {
     fcl.currentUser().subscribe(set_user);
     get_reserved_coordinates();
+    getAllNFTsMongo();
   }, []);
 
   // updating the canvas frequently on select
@@ -101,8 +106,20 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    console.log(result);
     setAllWalletNFTs(result);
+  };
+
+  // getting all users nfts from mongo
+  const getAllNFTsMongo = async () => {
+    setLoading(true);
+    const res = await axios({
+      url: "/api/nft",
+      method: "GET",
+    });
+    const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
+    setAllMongoNFTs(parsed_data);
+    setLoading(false);
+    setTileColors({});
   };
 
   // setting up a collection for user
@@ -178,18 +195,21 @@ const MainPage = () => {
 
   // rendering nft images and fetching
   const renderImages = async () => {
-    // fetching all nfts from mongo
-    const res = await axios({
-      url: "/api/nft",
-      method: "GET",
-    });
-    const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
+    // if (isLoading == true) return;
+
+    if (allMongoNFTs == "") {
+      const res = await axios({
+        url: "/api/nft",
+        method: "GET",
+      });
+      const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
+      setAllMongoNFTs(parsed_data);
+    }
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas?.getContext("2d");
 
-    // Loop through the images array and load each image
-    parsed_data.forEach((e) => {
+    allMongoNFTs.forEach((e) => {
       const nft_info = e;
       const imageObj = new Image();
       imageObj.src = nft_info.ipfs_hash.replace(
@@ -241,6 +261,17 @@ const MainPage = () => {
       }
     }
 
+    // let reserved_pxls = [];
+    // const reserved_cors = reserved_coordinates.map((e) =>
+    //   e.map((r) => reserved_pxls.push(r))
+    // );
+    // console.log(reserved_pxls);
+    // selected.map((e) =>
+    //   reserved_pxls.includes(e.column - e.row)
+    //     ? console.log(true)
+    //     : console.log(false)
+    // );
+
     // finding the lowest cordinates to render image
     let lowest_col;
     let lowest_row;
@@ -256,8 +287,8 @@ const MainPage = () => {
           : selected[i]["row"];
 
       new_arr.push({ column: lowest_col, row: lowest_row });
-      console.log({ selectedTile: selected[0] });
-      console.log({ SelectedTileOrdered: new_arr[0] });
+      // console.log({ selectedTile: selected[0] });
+      // console.log({ SelectedTileOrdered: new_arr[0] });
     }
 
     setSelectedTiles(selected);
@@ -302,122 +333,59 @@ const MainPage = () => {
 
   return (
     <>
-      <Navbar
-        userAddress={user?.addr}
-        logIn={logIn}
-        logOut={logOut}
-        setMyNFTs={setMyNFTs}
-        myNFTs={myNFTs}
-      />
-      {/* <button onClick={setupUser}>setup user</button> */}
-
-      <div
-        style={{
-          backgroundColor: "#3b0087",
-          padding: "35px 0",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          overflow: "hidden",
-        }}
-      >
-        <div>
-          <canvas
-            ref={canvasRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            width={1000}
-            height={1000}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <Navbar
+            userAddress={user?.addr}
+            logIn={logIn}
+            logOut={logOut}
+            setMyNFTs={setMyNFTs}
+            myNFTs={myNFTs}
           />
-        </div>
+          {/* <button onClick={setupUser}>setup user</button> */}
 
-        {myNFTs && (
           <div
             style={{
-              height: "91vh",
-              width: "400px",
-              border: "2px solid #7000ff",
+              backgroundColor: "#3b0087",
+              padding: "35px 0",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
             }}
-            className="fixed right-0 top-[60px] py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] shadow-xl z-20"
           >
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onClick={() => setMyNFTs(false)}
-              style={{ position: "absolute", right: "5px" }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                className="h-6 w-6 fill-jacarta-700 dark:fill-white"
+            <div>
+              <canvas
+                ref={canvasRef}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                width={1000}
+                height={1000}
+              />
+            </div>
+
+            {myNFTs && (
+              <div
+                style={{
+                  height: "91vh",
+                  width: "400px",
+                  border: "2px solid #7000ff",
+                  paddingTop: "30px",
+                  overflowY: "scroll",
+                }}
+                className="fixed right-0 top-[60px] py-2 mt-3 overflow-hidden origin-top-right bg-[#21004b] shadow-xl z-20"
               >
-                <path fill="none" d="M0 0h24v24H0z" />
-                <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
-              </svg>
-            </button>
-
-            {allWalletNFTs?.map((e) => {
-              return (
-                <div className="max-w-sm rounded overflow-hidden shadow-2xl">
-                  <img
-                    className="w-[100%] h-[200px] p-[10px]"
-                    src="avatar.png"
-                    height={100}
-                    width={100}
-                  />
-                  <div className="px-6 py-4">
-                    <div className="font-bold text-xl mb-2">{e.id}</div>
-                    <p className="text-gray-400 text-base">{e.ipfsHash}</p>
-                  </div>
-                  <div className="px-6 pt-4 pb-2">
-                    <a href="#" target="_blank">
-                      <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                        View on explorer 🡥
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {selectedTiles != "" && (
-          <div style={{ marginTop: "30px" }}>
-            <button
-              onClick={() => {
-                setIsMinting(true);
-              }}
-              className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
-            >
-              Mint Segment
-            </button>
-          </div>
-        )}
-
-        {isMintingModal && (
-          <>
-            <div className="backdrop-blur-lg fixed w-[100%] h-[200%] z-10"></div>
-            <div
-              className="fixed py-2 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl z-50"
-              id="transformMod"
-              style={{ border: "6px solid #7000ff" }}
-            >
-              <div style={{ padding: "20px 40px" }}>
-                <h3>Mint your segment</h3>
                 <button
                   type="button"
                   className="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={() => setIsMinting(false)}
-                  style={{ position: "absolute", right: "5px", top: "7px" }}
+                  onClick={() => setMyNFTs(false)}
+                  style={{ position: "absolute", right: "5px", top: "10px" }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -431,123 +399,214 @@ const MainPage = () => {
                   </svg>
                 </button>
 
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    mint();
+                {allWalletNFTs?.map((e, index) => {
+                  const nft_info = JSON.parse(e.metadata.name);
+                  return (
+                    <div
+                      className="max-w-sm rounded overflow-hidden shadow-2xl"
+                      key={index}
+                    >
+                      <img
+                        className="w-[100%] h-[200px] p-[10px]"
+                        src={e.ipfsHash.replace(
+                          "ipfs://",
+                          "https://ipfs.io/ipfs/"
+                        )}
+                        height={100}
+                        width={100}
+                      />
+                      <div className="px-6 py-4">
+                        <div className="font-bold text-xl mb-2">
+                          {nft_info?.nft_name}{" "}
+                          <span className="font-light text-sm">
+                            ({nft_info?.nftWidth}px * {nft_info?.nftHeight}px)
+                          </span>
+                        </div>
+                        <p className="text-gray-400 text-base">
+                          {nft_info?.nft_link}
+                        </p>
+                      </div>
+                      <div className="px-6 pt-4 pb-2">
+                        <a
+                          href={`https://testnet.flowscan.org/transaction/${e.uuid}`}
+                          target="_blank"
+                        >
+                          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                            View on explorer 🡥
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {selectedTiles != "" && (
+              <div style={{ marginTop: "30px" }}>
+                <button
+                  onClick={() => {
+                    if (!loggedIn) {
+                      logIn();
+                    }
+                    setIsMinting(true);
                   }}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "22px 0 0 0",
-                  }}
+                  className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <p>Title - </p>
-                    <input
-                      type="text"
-                      className="text-black"
-                      required
-                      onChange={(e) => set_nft_name(e.target.value)}
-                      placeholder="eg - Steady Rocks"
-                      style={{
-                        margin: "12px 4px",
-                        padding: "4px",
-                        border: "2px solid #7000ff",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <p>Link - </p>
-                    <input
-                      type="text"
-                      className="text-black"
-                      required
-                      onChange={(e) => set_nft_link(e.target.value)}
-                      placeholder="eg - https://steadyrocks.com"
-                      style={{
-                        margin: "12px 4px",
-                        padding: "4px",
-                        border: "2px solid #7000ff",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <p style={{ marginRight: "6px" }}>Select Image - </p>
-                    <input
-                      type="file"
-                      className="text"
-                      required
-                      onChange={(e) => set_file(e.target.files[0])}
-                      style={{ margin: "12px 0", padding: "4px" }}
-                    />
-                  </div>
-                  {isNFTMinting ? (
+                  Mint Segment
+                </button>
+              </div>
+            )}
+
+            {isMintingModal && (
+              <>
+                <div className="backdrop-blur-lg fixed w-[100%] h-[200%] z-10"></div>
+                <div
+                  className="fixed py-2 overflow-hidden origin-top-right bg-[#21004b] rounded-md shadow-xl z-50"
+                  id="transformMod"
+                  style={{ border: "6px solid #7000ff" }}
+                >
+                  <div style={{ padding: "20px 40px" }}>
+                    <h3>Mint your segment</h3>
                     <button
                       type="button"
-                      className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
-                      style={{ marginTop: "30px" }}
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      onClick={() => setIsMinting(false)}
+                      style={{ position: "absolute", right: "5px", top: "7px" }}
                     >
-                      Minting
                       <svg
-                        aria-hidden="true"
-                        className="inline w-6 h-6 ml-3 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                        viewBox="0 0 100 101"
-                        fill="none"
                         xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        className="h-6 w-6 fill-jacarta-700 dark:fill-white"
                       >
-                        <path
-                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                          fill="currentColor"
-                        />
-                        <path
-                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                          fill="currentFill"
-                        />
+                        <path fill="none" d="M0 0h24v24H0z" />
+                        <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
                       </svg>
                     </button>
-                  ) : (
-                    <button
-                      type="submit"
-                      className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
-                      style={{ marginTop: "30px" }}
-                    >
-                      Mint Segment
-                    </button>
-                  )}
-                </form>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
 
-      <Footer />
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        mint();
+                      }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "22px 0 0 0",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <p>Title - </p>
+                        <input
+                          type="text"
+                          className="text-black"
+                          required
+                          onChange={(e) => set_nft_name(e.target.value)}
+                          placeholder="eg - Steady Rocks"
+                          style={{
+                            margin: "12px 4px",
+                            padding: "4px",
+                            border: "2px solid #7000ff",
+                            outline: "none",
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <p>Link - </p>
+                        <input
+                          type="text"
+                          className="text-black"
+                          required
+                          onChange={(e) => set_nft_link(e.target.value)}
+                          placeholder="eg - https://steadyrocks.com"
+                          style={{
+                            margin: "12px 4px",
+                            padding: "4px",
+                            border: "2px solid #7000ff",
+                            outline: "none",
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <p style={{ marginRight: "6px" }}>Select Image - </p>
+                        <input
+                          type="file"
+                          className="text"
+                          required
+                          onChange={(e) => set_file(e.target.files[0])}
+                          style={{ margin: "12px 0", padding: "4px" }}
+                        />
+                      </div>
+                      {isNFTMinting ? (
+                        <button
+                          type="button"
+                          className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
+                          style={{ marginTop: "30px" }}
+                        >
+                          Minting
+                          <svg
+                            aria-hidden="true"
+                            className="inline w-6 h-6 ml-3 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                            viewBox="0 0 100 101"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                              fill="currentFill"
+                            />
+                          </svg>
+                        </button>
+                      ) : (
+                        <button
+                          type="submit"
+                          className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
+                          style={{ marginTop: "30px" }}
+                        >
+                          Mint Segment
+                        </button>
+                      )}
+                    </form>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <Footer />
+        </>
+      )}
     </>
   );
 };
