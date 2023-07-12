@@ -101,7 +101,7 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    console.log({ walletNFTs: result });
+    console.log(result);
     setAllWalletNFTs(result);
   };
 
@@ -380,26 +380,30 @@ const MainPage = () => {
               </svg>
             </button>
 
+            <div> hello</div>
+
             {allWalletNFTs?.map((e) => {
-              <div className="max-w-sm rounded overflow-hidden shadow-2xl">
-                <img
-                  className="w-[100%] h-[200px] p-[10px]"
-                  src="avatar.png"
-                  height={100}
-                  width={100}
-                />
-                <div className="px-6 py-4">
-                  <div className="font-bold text-xl mb-2">{e.id}</div>
-                  <p className="text-gray-400 text-base">{e.ipfsHash}</p>
+              return (
+                <div className="max-w-sm rounded overflow-hidden shadow-2xl">
+                  <img
+                    className="w-[100%] h-[200px] p-[10px]"
+                    src="avatar.png"
+                    height={100}
+                    width={100}
+                  />
+                  <div className="px-6 py-4">
+                    <div className="font-bold text-xl mb-2">{e.id}</div>
+                    <p className="text-gray-400 text-base">{e.ipfsHash}</p>
+                  </div>
+                  <div className="px-6 pt-4 pb-2">
+                    <a href="#" target="_blank">
+                      <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        View on explorer 🡥
+                      </span>
+                    </a>
+                  </div>
                 </div>
-                <div className="px-6 pt-4 pb-2">
-                  <a href="#" target="_blank">
-                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      View on explorer 🡥
-                    </span>
-                  </a>
-                </div>
-              </div>;
+              );
             })}
           </div>
         )}
