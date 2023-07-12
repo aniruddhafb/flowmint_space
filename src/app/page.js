@@ -39,7 +39,7 @@ const MainPage = () => {
   const tileSize = 10;
   const numColumns = 100;
   const numRows = 100;
-
+  
   fcl
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
@@ -207,24 +207,6 @@ const MainPage = () => {
         );
       };
     });
-    // result.forEach((e) => {
-    //   const nft_info = JSON.parse(e.metadata.name);
-    //   const imageObj = new Image();
-    //   imageObj.src = nft_info.ipfs_hash.replace(
-    //     "ipfs://",
-    //     "https://ipfs.io/ipfs/"
-    //   );
-
-    //   imageObj.onload = () => {
-    //     ctx.drawImage(
-    //       imageObj,
-    //       nft_info.nft_iniNFTCord.row * 10,
-    //       nft_info.nft_iniNFTCord.column * 10,
-    //       nft_info.nftWidth,
-    //       nft_info.nftHeight
-    //     );
-    //   };
-    // });
   };
 
   // when mouse cursor is triggered
@@ -379,8 +361,6 @@ const MainPage = () => {
                 <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
               </svg>
             </button>
-
-            <div> hello</div>
 
             {allWalletNFTs?.map((e) => {
               return (
