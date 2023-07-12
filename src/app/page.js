@@ -16,6 +16,8 @@ import defaultAvatar from "../../public/avatar.png";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
+  const [mouse_movement, set_mouse_movement] = useState(false);
+
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
   const [nft_link, set_nft_link] = useState("");
@@ -61,7 +63,10 @@ const MainPage = () => {
 
   // updating the canvas frequently on select
   useEffect(() => {
-    renderImages();
+    if (!mouse_movement) {
+      renderImages();
+    }
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
@@ -77,10 +82,8 @@ const MainPage = () => {
     }
   }, [tileColors]);
 
-
   // getting nfts and rendering it initially
   useEffect(() => {
-    // getUserNFTs();
     renderImages();
   }, [user?.addr]);
 
@@ -172,14 +175,24 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
+
+    // console.log(result);
+
     setAllWalletNFTs(result);
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
+    const res = await axios({
+      url: "/api/nft",
+      method: "GET",
+    });
+    const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
+    console.log(parsed_data);
+
     // Loop through the images array and load each image
-    result.forEach((e) => {
-      const nft_info = JSON.parse(e.metadata.name);
+    parsed_data.forEach((e) => {
+      const nft_info = e;
       const imageObj = new Image();
       imageObj.src = nft_info.ipfs_hash.replace(
         "ipfs://",
@@ -196,10 +209,29 @@ const MainPage = () => {
         );
       };
     });
+    // result.forEach((e) => {
+    //   const nft_info = JSON.parse(e.metadata.name);
+    //   const imageObj = new Image();
+    //   imageObj.src = nft_info.ipfs_hash.replace(
+    //     "ipfs://",
+    //     "https://ipfs.io/ipfs/"
+    //   );
+
+    //   imageObj.onload = () => {
+    //     ctx.drawImage(
+    //       imageObj,
+    //       nft_info.nft_iniNFTCord.row * 10,
+    //       nft_info.nft_iniNFTCord.column * 10,
+    //       nft_info.nftWidth,
+    //       nft_info.nftHeight
+    //     );
+    //   };
+    // });
   };
 
   // when mouse cursor is triggered
   const handleMouseDown = (event) => {
+    set_mouse_movement(true);
     const { offsetX, offsetY } = event.nativeEvent;
     const startColumn = Math.floor(offsetX / tileSize);
     const startRow = Math.floor(offsetY / tileSize);
@@ -210,6 +242,7 @@ const MainPage = () => {
   // when mouse cursor moves
   const handleMouseMove = (event) => {
     if (!startTile) return;
+    set_mouse_movement(true);
 
     const { offsetX, offsetY } = event.nativeEvent;
     const endColumn = Math.floor(offsetX / tileSize);
@@ -246,7 +279,6 @@ const MainPage = () => {
 
       new_arr.push({ column: lowest_col, row: lowest_row });
     }
-    console.log(new_arr);
 
     setSelectedTiles(selected);
     const uniqueColumnsY = [...new Set(selected.map((q) => q.row))];
@@ -278,6 +310,7 @@ const MainPage = () => {
 
   // when mouse cursor is released
   const handleMouseUp = () => {
+    set_mouse_movement(false);
     setStartTile(null);
     if (selectedTiles.length > 100) {
       setTileColors({});
@@ -348,16 +381,21 @@ const MainPage = () => {
             </button>
 
             <div className="max-w-sm rounded overflow-hidden shadow-2xl">
-              <img className="w-[100%] h-[200px] p-[10px]" src="avatar.png" height={100} width={100} />
+              <img
+                className="w-[100%] h-[200px] p-[10px]"
+                src="avatar.png"
+                height={100}
+                width={100}
+              />
               <div className="px-6 py-4">
                 <div className="font-bold text-xl mb-2">The Coldest Sunset</div>
-                <p className="text-gray-400 text-base">
-                  block.com
-                </p>
+                <p className="text-gray-400 text-base">block.com</p>
               </div>
               <div className="px-6 pt-4 pb-2">
                 <a href="#" target="_blank">
-                  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">View on explorer 🡥</span>
+                  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                    View on explorer 🡥
+                  </span>
                 </a>
               </div>
             </div>
