@@ -97,6 +97,7 @@ const MainPage = () => {
   // getting nfts and rendering it initially
   useEffect(() => {
     renderImages();
+    getUserNFTs();
   }, [user?.addr]);
 
   // getting all users nfts from wallet
@@ -105,7 +106,7 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    console.log(result);
+    console.log({ result: result });
     setAllWalletNFTs(result);
   };
 
