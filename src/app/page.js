@@ -72,6 +72,7 @@ const MainPage = () => {
     fcl.currentUser().subscribe(set_user);
     get_reserved_coordinates();
     getAllNFTsMongo();
+    getUserNFTs();
   }, []);
 
   // updating the canvas frequently on select
@@ -96,7 +97,6 @@ const MainPage = () => {
   // getting nfts and rendering it initially
   useEffect(() => {
     renderImages();
-    getUserNFTs();
   }, [user?.addr]);
 
   // getting all users nfts from wallet
@@ -236,6 +236,7 @@ const MainPage = () => {
     const startRow = Math.floor(offsetY / tileSize);
     setStartTile({ column: startColumn, row: startRow });
     setTileColors({});
+    setSelectedTiles([]);
   };
 
 
@@ -404,7 +405,7 @@ const MainPage = () => {
                       />
                       <div className="px-6 py-4">
                         <div className="font-bold text-xl mb-2">{nft_info?.nft_name} <span className="font-light text-sm">({nft_info?.nftWidth}px * {nft_info?.nftHeight}px)</span></div>
-                        <p className="text-gray-400 text-base">{nft_info?.nft_link}</p>
+                        <p className="text-gray-400 text-base">{nft_info?.nft_link} <a className="text-gray-200" href={`${nft_info?.nft_link}`} target="_blank">🡥</a></p>
                       </div>
                       <div className="px-6 pt-4 pb-2">
                         <a href={`https://testnet.flowscan.org/transaction/${e.uuid}`} target="_blank">
