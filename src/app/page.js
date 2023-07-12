@@ -73,6 +73,7 @@ const MainPage = () => {
     fcl.currentUser().subscribe(set_user);
     get_reserved_coordinates();
     getAllNFTsMongo();
+    getUserNFTs();
   }, []);
 
   // updating the canvas frequently on select
@@ -106,6 +107,7 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
+    console.log({ result: result });
     setAllWalletNFTs(result);
   };
 
@@ -236,6 +238,7 @@ const MainPage = () => {
     const startRow = Math.floor(offsetY / tileSize);
     setStartTile({ column: startColumn, row: startRow });
     setTileColors({});
+    setSelectedTiles([]);
   };
 
   // when mouse cursor moves
@@ -423,7 +426,14 @@ const MainPage = () => {
                           </span>
                         </div>
                         <p className="text-gray-400 text-base">
-                          {nft_info?.nft_link}
+                          {nft_info?.nft_link}{" "}
+                          <a
+                            className="text-gray-200"
+                            href={`${nft_info?.nft_link}`}
+                            target="_blank"
+                          >
+                            🡥
+                          </a>
                         </p>
                       </div>
                       <div className="px-6 pt-4 pb-2">
