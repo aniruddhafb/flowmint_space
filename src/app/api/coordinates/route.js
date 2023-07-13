@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import axios from "axios";
+import axios, { all } from "axios";
 import dbConnect from "@/lib/dbConnect";
 import coordinates from "../../../models/coordinates";
 
@@ -8,7 +8,13 @@ export async function GET(request) {
 
   const all_coordinates = await coordinates.find();
 
-  return NextResponse.json(all_coordinates);
+  let arr = [];
+
+  for (let i = 0; i < all_coordinates.length; i++) {
+    JSON.parse(all_coordinates[i]["coordinates"]).map((e) => arr.push(e));
+  }
+
+  return NextResponse.json(arr);
 }
 
 export async function POST(request) {
