@@ -15,11 +15,13 @@ import axios from "axios";
 import defaultAvatar from "../../public/avatar.png";
 import Loader from "@/components/Loader.jsx";
 import { get_user_collection } from "../../cadence/scripts/check_collection.js";
+import Router from "next/router.js";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
 
   const [reserved_coordinates, set_reserved_coordinates] = useState([]);
+  const [pixel_data, set_pixel_data] = useState([]);
   const [user, set_user] = useState();
   const [nft_name, set_nft_name] = useState("");
   const [nft_link, set_nft_link] = useState("");
@@ -67,10 +69,15 @@ const MainPage = () => {
       url: "/api/coordinates",
       method: "GET",
     });
-    const cords = res.data.map(
-      (e) => e["column"].toString() + e["row"].toString()
-    );
-    set_reserved_coordinates(cords);
+    const all_reserved_cors = [];
+    const cords = res.data.map((e) => {
+      const startingNumberRegex = /^\d+/;
+      const startingNumber = e.match(startingNumberRegex)[0];
+      all_reserved_cors.push(startingNumber);
+      return e;
+    });
+    set_pixel_data(cords);
+    set_reserved_coordinates(all_reserved_cors);
   };
 
   //sets user to logged in user
@@ -117,7 +124,6 @@ const MainPage = () => {
   };
 
   const check_user_col = async () => {
-    console.log(user?.addr);
     if (!user?.addr) return;
     const result = await fcl
       .send([
@@ -134,6 +140,7 @@ const MainPage = () => {
       url: "/api/nft",
       method: "GET",
     });
+    let newArr = [];
     const parsed_data = res.data.map((e) => JSON.parse(e.metadata));
     setAllMongoNFTs(parsed_data);
     setLoading(false);
@@ -170,7 +177,6 @@ const MainPage = () => {
         nftHeight,
         nftWidth,
       });
-
       const txn_id = await fcl
         .send([
           fcl.transaction(mintNFT),
@@ -185,7 +191,6 @@ const MainPage = () => {
           fcl.limit(9999),
         ])
         .then(fcl.decode);
-
       const save_nft = await axios({
         url: "/api/nft",
         method: "POST",
@@ -195,14 +200,28 @@ const MainPage = () => {
       });
 
       //
+      let cords = [];
+      selectedTiles.map((e) =>
+        cords.push(e.column.toString() + e.row.toString())
+      );
+
       const save_coordinate = await axios({
         url: "/api/coordinates",
         method: "POST",
         data: {
-          new_coordinate: JSON.stringify([...selectedTiles]),
+          new_coordinate: JSON.stringify([...cords]),
+          title: nft_name,
+          link: nft_link,
         },
       });
-
+      console.log(save_coordinate.data);
+      // const save_coordinate = await axios({
+      //   url: "/api/coordinates",
+      //   method: "POST",
+      //   data: {
+      //     new_coordinate: JSON.stringify([...selectedTiles]),
+      //   },
+      // });
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -251,7 +270,18 @@ const MainPage = () => {
     const { offsetX, offsetY } = event.nativeEvent;
     const startColumn = Math.floor(offsetX / tileSize);
     const startRow = Math.floor(offsetY / tileSize);
+    const pxl = `${startColumn.toString() + startRow.toString()}`;
+
     setStartTile({ column: startColumn, row: startRow });
+    pixel_data.map((e) => {
+      const startingNumberRegex = /^\d+/;
+      const startingNumber = e.match(startingNumberRegex)[0];
+      if (startingNumber.toString() === pxl) {
+        const linkRegex = /\/link=(.*)$/;
+        const link = e.match(linkRegex)[1];
+        window.open(link, "_blank");
+      }
+    });
     setTileColors({});
     setSelectedTiles([]);
   };
@@ -324,7 +354,7 @@ const MainPage = () => {
       setTileColors(updatedColors);
     }
 
-    // handling selection of reserved cordinates 
+    // handling selection of reserved cordinates
     for (let i = 0; i < selected.length; i++) {
       if (
         reserved_coordinates.includes(
@@ -367,7 +397,6 @@ const MainPage = () => {
             setMyNFTs={setMyNFTs}
             myNFTs={myNFTs}
           />
-          {/* <button onClick={setupUser}>setup user</button> */}
 
           <div
             style={{

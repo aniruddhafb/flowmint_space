@@ -11,7 +11,12 @@ export async function GET(request) {
   let arr = [];
 
   for (let i = 0; i < all_coordinates.length; i++) {
-    JSON.parse(all_coordinates[i]["coordinates"]).map((e) => arr.push(e));
+    console.log(all_coordinates[i]);
+    JSON.parse(all_coordinates[i]["coordinates"]).map((e) =>
+      arr.push(
+        `${e}/title=${all_coordinates[i].title}/link=${all_coordinates[i].link}`
+      )
+    );
   }
 
   return NextResponse.json(arr);
@@ -20,10 +25,13 @@ export async function GET(request) {
 export async function POST(request) {
   dbConnect();
 
-  const { new_coordinate } = await request.json();
+  const { new_coordinate, title, link } = await request.json();
+  console.log({ title, link });
 
   const save_coordinate = await coordinates.create({
     coordinates: new_coordinate,
+    title,
+    link,
   });
 
   return NextResponse.json(save_coordinate);
