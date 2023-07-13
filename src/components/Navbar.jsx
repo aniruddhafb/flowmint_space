@@ -50,8 +50,11 @@ const Navbar = ({ userAddress, logIn, logOut, setMyNFTs }) => {
                     </div>
 
                     <div className="flex flex-col -mx-6 lg:flex-row lg:items-center lg:mx-8">
-                        <h4 className="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200">
+                        <h4 className="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200" id="CustomPCText">
                             $1 per pixel . Own a piece of web3 history!
+                        </h4>
+                        <h4 className="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0 dark:text-gray-200" id="CustomPhoneText">
+                            This version of website only works on laptops/desktops ✓
                         </h4>
                     </div>
 
@@ -155,7 +158,7 @@ const Navbar = ({ userAddress, logIn, logOut, setMyNFTs }) => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex items-center mt-4 lg:mt-0">
+                                <div className="flex items-center mt-4 lg:mt-0" id="connectPhone">
                                     <button
                                         onClick={logIn}
                                         className="w-full px-5 py-2 mr-4 text-sm tracking-wider text-white uppercase transition-colors duration-300 transform bg-blue-600 rounded-lg lg:w-auto hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
