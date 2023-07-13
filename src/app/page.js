@@ -117,6 +117,7 @@ const MainPage = () => {
   };
 
   const check_user_col = async () => {
+    console.log(user?.addr);
     if (!user?.addr) return;
     const result = await fcl
       .send([
@@ -213,7 +214,6 @@ const MainPage = () => {
 
   // rendering nft images and fetching
   const renderImages = async () => {
-
     if (allMongoNFTs == "") {
       const res = await axios({
         url: "/api/nft",
