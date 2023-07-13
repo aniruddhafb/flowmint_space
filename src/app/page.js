@@ -280,6 +280,8 @@ const MainPage = () => {
       if (startingNumber.toString() === pxl) {
         const linkRegex = /\/link=(.*)$/;
         const link = e.match(linkRegex)[1];
+        console.log({ link: link })
+        setStartTile("");
         window.open(link, "_blank");
       }
     });
