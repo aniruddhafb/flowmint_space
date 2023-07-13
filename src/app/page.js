@@ -76,6 +76,7 @@ const MainPage = () => {
       all_reserved_cors.push(startingNumber);
       return e;
     });
+    console.log(cords)
     set_pixel_data(cords);
     set_reserved_coordinates(all_reserved_cors);
   };
@@ -274,12 +275,12 @@ const MainPage = () => {
 
     setStartTile({ column: startColumn, row: startRow });
     pixel_data.map((e) => {
+      // console.log(e)
       const startingNumberRegex = /^\d+/;
       const startingNumber = e.match(startingNumberRegex)[0];
       if (startingNumber.toString() === pxl) {
         const linkRegex = /\/link=(.*)$/;
         const link = e.match(linkRegex)[1];
-        console.log({ link: link })
         setStartTile("");
         window.open(link, "_blank");
       }
