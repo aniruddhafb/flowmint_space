@@ -70,7 +70,6 @@ const MainPage = () => {
     const cords = res.data.map(
       (e) => e["column"].toString() + e["row"].toString()
     );
-    console.log(cords);
     set_reserved_coordinates(cords);
   };
 
@@ -114,7 +113,6 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    // console.log({ result: result });
     setAllWalletNFTs(result);
   };
 
@@ -127,7 +125,6 @@ const MainPage = () => {
         fcl.args([fcl.arg(user?.addr, t.Address)]),
       ])
       .then(fcl.decode);
-    console.log({ user_col: result });
   };
 
   // getting all users nfts from mongo
@@ -161,7 +158,7 @@ const MainPage = () => {
 
   // minting nft segment
   const mint = async () => {
-    // setNFTMinting(true);
+    setNFTMinting(true);
     try {
       const ipfs_hash = await storage.upload(file);
       const nft_data = JSON.stringify({
@@ -205,7 +202,6 @@ const MainPage = () => {
           new_coordinate: JSON.stringify([...selectedTiles]),
         },
       });
-      console.log(save_coordinate.data);
 
       setTimeout(() => {
         window.location.reload();
@@ -283,17 +279,6 @@ const MainPage = () => {
       }
     }
 
-    // let reserved_pxls = [];
-    // const reserved_cors = reserved_coordinates.map((e) =>
-    //   e.map((r) => reserved_pxls.push(r))
-    // );
-    // console.log(reserved_pxls);
-    // selected.map((e) =>
-    //   reserved_pxls.includes(e.column - e.row)
-    //     ? console.log(true)
-    //     : console.log(false)
-    // );
-
     // finding the lowest cordinates to render image
     let lowest_col;
     let lowest_row;
@@ -311,16 +296,6 @@ const MainPage = () => {
       new_arr.push({ column: lowest_col, row: lowest_row });
     }
 
-    for (let i = 0; i < selected.length; i++) {
-      // if(reserved_coordinates.includes)
-      if (
-        reserved_coordinates.includes(
-          selected[i]["column"].toString() + selected[i]["row"].toString()
-        )
-      ) {
-        console.log(true);
-      }
-    }
     setSelectedTiles(selected);
     const uniqueColumnsY = [...new Set(selected.map((q) => q.row))];
     const uniqueRowsX = [...new Set(selected.map((q) => q.column))];
@@ -332,6 +307,7 @@ const MainPage = () => {
 
     set_nftWidth(uniqueRowsX.length * 10);
 
+    // handling selection for 100+ pixels
     if (selectedTiles.length > 100) {
       const updatedColors = {};
       selected.forEach((tile) => {
@@ -346,6 +322,23 @@ const MainPage = () => {
         updatedColors[tileKey] = "gold";
       });
       setTileColors(updatedColors);
+    }
+
+    // handling selection of reserved cordinates 
+    for (let i = 0; i < selected.length; i++) {
+      if (
+        reserved_coordinates.includes(
+          selected[i]["column"].toString() + selected[i]["row"].toString()
+        )
+      ) {
+        const updatedColors = {};
+        selected.forEach((tile) => {
+          const tileKey = `${tile.column}-${tile.row}`;
+          updatedColors[tileKey] = "red";
+        });
+        setTileColors(updatedColors);
+        setSelectedTiles([]);
+      }
     }
   };
 
