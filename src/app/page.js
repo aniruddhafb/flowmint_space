@@ -14,6 +14,7 @@ import axios from "axios";
 // import Image from "next/image.js";
 import defaultAvatar from "../../public/avatar.png";
 import Loader from "@/components/Loader.jsx";
+import { get_user_collection } from "../../cadence/scripts/check_collection.js";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
@@ -79,6 +80,7 @@ const MainPage = () => {
     get_reserved_coordinates();
     getAllNFTsMongo();
     getUserNFTs();
+    check_user_col();
   }, []);
 
   // updating the canvas frequently on select
@@ -114,6 +116,17 @@ const MainPage = () => {
       .then(fcl.decode);
     // console.log({ result: result });
     setAllWalletNFTs(result);
+  };
+
+  const check_user_col = async () => {
+    if (!user?.addr) return;
+    const result = await fcl
+      .send([
+        fcl.script(get_user_collection),
+        fcl.args([fcl.arg(user?.addr, t.Address)]),
+      ])
+      .then(fcl.decode);
+    console.log({ user_col: result });
   };
 
   // getting all users nfts from mongo
