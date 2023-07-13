@@ -276,6 +276,7 @@ const MainPage = () => {
     pixel_data.map((e) => {
       const startingNumberRegex = /^\d+/;
       const startingNumber = e.match(startingNumberRegex)[0];
+      
       if (startingNumber.toString() === pxl) {
         const linkRegex = /\/link=(.*)$/;
         const link = e.match(linkRegex)[1];
