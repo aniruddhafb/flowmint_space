@@ -583,9 +583,20 @@ const MainPage = () => {
                           justifyContent: "row",
                           alignItems: "center",
                           justifyContent: "center",
+                          textAlign: "center"
                         }}
                       >
-                        <p style={{ marginRight: "6px" }}>Select Image - </p>
+                        <p style={{ marginTop: "12px" }}>(Please prefer {nftWidth}X{nftHeight}px Image) </p>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <p style={{ marginLeft: "76px" }}>Select Image - </p>
                         <input
                           type="file"
                           className="text"
@@ -593,6 +604,19 @@ const MainPage = () => {
                           onChange={(e) => set_file(e.target.files[0])}
                           style={{ margin: "12px 0", padding: "4px" }}
                         />
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          marginTop: "15px"
+                        }}
+                      >
+                        <p>You have selected {selectedTiles?.length} pixels - Total cost for minting ${selectedTiles?.length}</p>
+                        <p>(But its free, as we are not charging any fees on the hackathon version)</p>
                       </div>
                       {isNFTMinting ? (
                         <button
