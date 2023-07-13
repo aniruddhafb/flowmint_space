@@ -239,7 +239,6 @@ const MainPage = () => {
           link: nft_link,
         },
       });
-
       setTimeout(() => {
         window.location.reload();
       }, 1000);
