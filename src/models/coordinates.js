@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const CoordinatesSchema = new mongoose.Schema({
-  coordinates: String,
+  coordinates: [String],
 });
 
 module.exports =

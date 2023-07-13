@@ -66,6 +66,11 @@ const MainPage = () => {
       url: "/api/coordinates",
       method: "GET",
     });
+    const cords = res.data.map(
+      (e) => e["column"].toString() + e["row"].toString()
+    );
+    console.log(cords);
+    set_reserved_coordinates(cords);
   };
 
   //sets user to logged in user
@@ -107,7 +112,7 @@ const MainPage = () => {
     const result = await fcl
       .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
       .then(fcl.decode);
-    console.log({ result: result });
+    // console.log({ result: result });
     setAllWalletNFTs(result);
   };
 
@@ -142,7 +147,7 @@ const MainPage = () => {
 
   // minting nft segment
   const mint = async () => {
-    setNFTMinting(true);
+    // setNFTMinting(true);
     try {
       const ipfs_hash = await storage.upload(file);
       const nft_data = JSON.stringify({
@@ -178,13 +183,15 @@ const MainPage = () => {
         },
       });
 
+      //
       const save_coordinate = await axios({
         url: "/api/coordinates",
         method: "POST",
         data: {
-          new_coordinate: JSON.stringify(selectedTiles),
+          new_coordinate: JSON.stringify([...selectedTiles]),
         },
       });
+      console.log(save_coordinate.data);
 
       setTimeout(() => {
         window.location.reload();
@@ -294,6 +301,16 @@ const MainPage = () => {
       // console.log({ SelectedTileOrdered: new_arr[0] });
     }
 
+    for (let i = 0; i < selected.length; i++) {
+      // if(reserved_coordinates.includes)
+      if (
+        reserved_coordinates.includes(
+          selected[i]["column"].toString() + selected[i]["row"].toString()
+        )
+      ) {
+        console.log(true);
+      }
+    }
     setSelectedTiles(selected);
     const uniqueColumnsY = [...new Set(selected.map((q) => q.row))];
     const uniqueRowsX = [...new Set(selected.map((q) => q.column))];
