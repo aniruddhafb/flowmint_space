@@ -197,7 +197,6 @@ const MainPage = () => {
 
   // rendering nft images and fetching
   const renderImages = async () => {
-    // if (isLoading == true) return;
 
     if (allMongoNFTs == "") {
       const res = await axios({
@@ -290,8 +289,6 @@ const MainPage = () => {
           : selected[i]["row"];
 
       new_arr.push({ column: lowest_col, row: lowest_row });
-      // console.log({ selectedTile: selected[0] });
-      // console.log({ SelectedTileOrdered: new_arr[0] });
     }
 
     setSelectedTiles(selected);
