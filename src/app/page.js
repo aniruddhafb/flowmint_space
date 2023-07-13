@@ -53,8 +53,8 @@ const MainPage = () => {
     .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
 
   // login
-  const logIn = () => {
-    fcl.authenticate();
+  const logIn = async () => {
+    await fcl.authenticate();
     setLoggedIn(true);
   };
 
@@ -69,6 +69,7 @@ const MainPage = () => {
       url: "/api/coordinates",
       method: "GET",
     });
+
     const all_reserved_cors = [];
     const cords = res.data.map((e) => {
       const startingNumberRegex = /^\d+/;
@@ -76,7 +77,7 @@ const MainPage = () => {
       all_reserved_cors.push(startingNumber);
       return e;
     });
-    console.log(cords)
+
     set_pixel_data(cords);
     set_reserved_coordinates(all_reserved_cors);
   };
@@ -87,7 +88,6 @@ const MainPage = () => {
     get_reserved_coordinates();
     getAllNFTsMongo();
     getUserNFTs();
-    check_user_col();
   }, []);
 
   // updating the canvas frequently on select
@@ -113,25 +113,34 @@ const MainPage = () => {
   useEffect(() => {
     renderImages();
     getUserNFTs();
+
+    // setupUser();
   }, [user?.addr]);
 
   // getting all users nfts from wallet
   const getUserNFTs = async () => {
-    if (!user?.addr) return;
-    const result = await fcl
-      .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
-      .then(fcl.decode);
-    setAllWalletNFTs(result);
+    try {
+      if (!user?.addr) return;
+      const result = await fcl
+        .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
+        .then(fcl.decode);
+      setAllWalletNFTs(result);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const check_user_col = async () => {
-    if (!user?.addr) return;
+    // if (!user?.addr) return;
+    console.log("fun called");
     const result = await fcl
       .send([
         fcl.script(get_user_collection),
         fcl.args([fcl.arg(user?.addr, t.Address)]),
       ])
       .then(fcl.decode);
+
+    console.log({ result });
   };
 
   // getting all users nfts from mongo
@@ -148,20 +157,55 @@ const MainPage = () => {
     setTileColors({});
   };
 
+  const check_user = async () => {
+    try {
+      const res = await axios({
+        url: "/api/user_exist",
+        method: "POST",
+        data: {
+          wallet: user?.addr,
+        },
+      });
+    } catch (error) { }
+  };
+
   // setting up a collection for user
   const setupUser = async () => {
-    const transactionId = await fcl
-      .send([
-        fcl.transaction(setupUserTx),
-        fcl.args([]),
-        fcl.payer(fcl.authz),
-        fcl.proposer(fcl.authz),
-        fcl.authorizations([fcl.authz]),
-        fcl.limit(9999),
-      ])
-      .then(fcl.decode);
+    console.log("fun rannn");
+    if (!user?.addr) return;
+    const res = await axios({
+      url: "/api/user_exist",
+      method: "POST",
+      data: {
+        wallet: user?.addr,
+      },
+    });
+    console.log(res.data);
 
-    return fcl.tx(transactionId).onceSealed();
+    if (!res.data.success) {
+      const transactionId = await fcl
+        .send([
+          fcl.transaction(setupUserTx),
+          fcl.args([]),
+          fcl.payer(fcl.authz),
+          fcl.proposer(fcl.authz),
+          fcl.authorizations([fcl.authz]),
+          fcl.limit(9999),
+        ])
+        .then(fcl.decode);
+
+      console.log(transactionId);
+
+      const create_user = await axios({
+        url: "/api/user",
+        method: "POST",
+        data: {
+          wallet: user?.addr,
+        },
+      });
+      console.log(create_user.data);
+      return fcl.tx(transactionId).onceSealed();
+    }
   };
 
   // minting nft segment
@@ -192,6 +236,7 @@ const MainPage = () => {
           fcl.limit(9999),
         ])
         .then(fcl.decode);
+
       const save_nft = await axios({
         url: "/api/nft",
         method: "POST",
@@ -215,6 +260,8 @@ const MainPage = () => {
           link: nft_link,
         },
       });
+      console.log(save_coordinate.data);
+
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -222,6 +269,7 @@ const MainPage = () => {
     } catch (error) {
       console.log(error.message);
     }
+    setNFTMinting(false);
   };
 
   // rendering nft images and fetching
@@ -270,6 +318,7 @@ const MainPage = () => {
       // console.log(e)
       const startingNumberRegex = /^\d+/;
       const startingNumber = e.match(startingNumberRegex)[0];
+
       if (startingNumber.toString() === pxl) {
         const linkRegex = /\/link=(.*)$/;
         const link = e.match(linkRegex)[1];
@@ -392,6 +441,7 @@ const MainPage = () => {
             setMyNFTs={setMyNFTs}
             myNFTs={myNFTs}
           />
+          <button onClick={setupUser}>setup user</button>
 
           <div
             style={{
@@ -607,10 +657,12 @@ const MainPage = () => {
                           justifyContent: "row",
                           alignItems: "center",
                           justifyContent: "center",
-                          textAlign: "center"
+                          textAlign: "center",
                         }}
                       >
-                        <p style={{ marginTop: "12px" }}>(Please prefer {nftWidth}X{nftHeight}px Image) </p>
+                        <p style={{ marginTop: "12px" }}>
+                          (Please prefer {nftWidth}X{nftHeight}px Image){" "}
+                        </p>
                       </div>
                       <div
                         style={{
@@ -636,11 +688,17 @@ const MainPage = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           textAlign: "center",
-                          marginTop: "15px"
+                          marginTop: "15px",
                         }}
                       >
-                        <p>You have selected {selectedTiles?.length} pixels - Total cost for minting ${selectedTiles?.length}</p>
-                        <p>(But its free, as we are not charging any fees on the hackathon version)</p>
+                        <p>
+                          You have selected {selectedTiles?.length} pixels -
+                          Total cost for minting ${selectedTiles?.length}
+                        </p>
+                        <p>
+                          (But its free, as we are not charging any fees on the
+                          hackathon version)
+                        </p>
                       </div>
                       {isNFTMinting ? (
                         <button
