@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import * as fcl from "@onflow/fcl";
 import * as t from "@onflow/types";
 import { ThirdwebStorage } from "@thirdweb-dev/storage";
-
 import { mintNFT } from "../../cadence/transactions/mint_nfts.js";
 import { setupUserTx } from "../../cadence/transactions/setup_user.js";
 
@@ -11,11 +10,8 @@ import { getNFTs } from "../../cadence/scripts/get_nfts.js";
 import Footer from "@/components/Footer.jsx";
 import Navbar from "@/components/Navbar.jsx";
 import axios from "axios";
-// import Image from "next/image.js";
-import defaultAvatar from "../../public/avatar.png";
 import Loader from "@/components/Loader.jsx";
 import { get_user_collection } from "../../cadence/scripts/check_collection.js";
-import Router from "next/router.js";
 
 const MainPage = () => {
   const storage = new ThirdwebStorage();
@@ -63,31 +59,13 @@ const MainPage = () => {
     fcl.unauthenticate();
   };
 
-  // getting all reserved cordinates
-  const get_reserved_coordinates = async () => {
-    const res = await axios({
-      url: "/api/coordinates",
-      method: "GET",
-    });
-
-    const all_reserved_cors = [];
-    const cords = res.data.map((e) => {
-      const startingNumberRegex = /^\d+/;
-      const startingNumber = e.match(startingNumberRegex)[0];
-      all_reserved_cors.push(startingNumber);
-      return e;
-    });
-
-    set_pixel_data(cords);
-    set_reserved_coordinates(all_reserved_cors);
-  };
-
   //sets user to logged in user
   useEffect(() => {
     fcl.currentUser().subscribe(set_user);
     get_reserved_coordinates();
     getAllNFTsMongo();
     getUserNFTs();
+    // setupUser();
   }, []);
 
   // updating the canvas frequently on select
@@ -113,9 +91,26 @@ const MainPage = () => {
   useEffect(() => {
     renderImages();
     getUserNFTs();
-
-    // setupUser();
   }, [user?.addr]);
+
+  // getting all reserved cordinates
+  const get_reserved_coordinates = async () => {
+    const res = await axios({
+      url: "/api/coordinates",
+      method: "GET",
+    });
+
+    const all_reserved_cors = [];
+    const cords = res.data.map((e) => {
+      const startingNumberRegex = /^\d+/;
+      const startingNumber = e.match(startingNumberRegex)[0];
+      all_reserved_cors.push(startingNumber);
+      return e;
+    });
+
+    set_pixel_data(cords);
+    set_reserved_coordinates(all_reserved_cors);
+  };
 
   // getting all users nfts from wallet
   const getUserNFTs = async () => {
@@ -130,17 +125,14 @@ const MainPage = () => {
     }
   };
 
+  // getting onchain user col 
   const check_user_col = async () => {
-    // if (!user?.addr) return;
-    console.log("fun called");
     const result = await fcl
       .send([
         fcl.script(get_user_collection),
         fcl.args([fcl.arg(user?.addr, t.Address)]),
       ])
       .then(fcl.decode);
-
-    console.log({ result });
   };
 
   // getting all users nfts from mongo
@@ -157,22 +149,8 @@ const MainPage = () => {
     setTileColors({});
   };
 
-  const check_user = async () => {
-    try {
-      const res = await axios({
-        url: "/api/user_exist",
-        method: "POST",
-        data: {
-          wallet: user?.addr,
-        },
-      });
-    } catch (error) { }
-  };
-
   // setting up a collection for user
   const setupUser = async () => {
-    console.log("fun rannn");
-    if (!user?.addr) return;
     const res = await axios({
       url: "/api/user_exist",
       method: "POST",
@@ -180,7 +158,6 @@ const MainPage = () => {
         wallet: user?.addr,
       },
     });
-    console.log(res.data);
 
     if (!res.data.success) {
       const transactionId = await fcl
@@ -194,8 +171,6 @@ const MainPage = () => {
         ])
         .then(fcl.decode);
 
-      console.log(transactionId);
-
       const create_user = await axios({
         url: "/api/user",
         method: "POST",
@@ -203,15 +178,15 @@ const MainPage = () => {
           wallet: user?.addr,
         },
       });
-      console.log(create_user.data);
-      return fcl.tx(transactionId).onceSealed();
     }
   };
 
   // minting nft segment
   const mint = async () => {
+    if (!user?.addr) return;
     setNFTMinting(true);
     try {
+      await setupUser();
       const ipfs_hash = await storage.upload(file);
       const nft_data = JSON.stringify({
         ipfs_hash,
@@ -260,7 +235,6 @@ const MainPage = () => {
           link: nft_link,
         },
       });
-      console.log(save_coordinate.data);
 
       setTimeout(() => {
         window.location.reload();
@@ -268,6 +242,9 @@ const MainPage = () => {
       return fcl.tx(txn_id).onceSealed();
     } catch (error) {
       console.log(error.message);
+      alert("Please switch to blockto wallet, other wallets are not supported yet!");
+      logOut();
+      window.location.reload();
     }
     setNFTMinting(false);
   };
@@ -315,7 +292,6 @@ const MainPage = () => {
 
     setStartTile({ column: startColumn, row: startRow });
     pixel_data.map((e) => {
-      // console.log(e)
       const startingNumberRegex = /^\d+/;
       const startingNumber = e.match(startingNumberRegex)[0];
 
@@ -441,7 +417,6 @@ const MainPage = () => {
             setMyNFTs={setMyNFTs}
             myNFTs={myNFTs}
           />
-          <button onClick={setupUser}>setup user</button>
 
           <div
             style={{
