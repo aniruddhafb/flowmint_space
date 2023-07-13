@@ -76,6 +76,7 @@ const MainPage = () => {
       all_reserved_cors.push(startingNumber);
       return e;
     });
+    console.log(cords);
     set_pixel_data(cords);
     set_reserved_coordinates(all_reserved_cors);
   };
@@ -215,13 +216,6 @@ const MainPage = () => {
         },
       });
       console.log(save_coordinate.data);
-      // const save_coordinate = await axios({
-      //   url: "/api/coordinates",
-      //   method: "POST",
-      //   data: {
-      //     new_coordinate: JSON.stringify([...selectedTiles]),
-      //   },
-      // });
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -276,11 +270,11 @@ const MainPage = () => {
     pixel_data.map((e) => {
       const startingNumberRegex = /^\d+/;
       const startingNumber = e.match(startingNumberRegex)[0];
-      
+
       if (startingNumber.toString() === pxl) {
         const linkRegex = /\/link=(.*)$/;
         const link = e.match(linkRegex)[1];
-        console.log({ link: link })
+        // console.log({ link: link });
         setStartTile("");
         window.open(link, "_blank");
       }
@@ -615,10 +609,12 @@ const MainPage = () => {
                           justifyContent: "row",
                           alignItems: "center",
                           justifyContent: "center",
-                          textAlign: "center"
+                          textAlign: "center",
                         }}
                       >
-                        <p style={{ marginTop: "12px" }}>(Please prefer {nftWidth}X{nftHeight}px Image) </p>
+                        <p style={{ marginTop: "12px" }}>
+                          (Please prefer {nftWidth}X{nftHeight}px Image){" "}
+                        </p>
                       </div>
                       <div
                         style={{
@@ -644,11 +640,17 @@ const MainPage = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           textAlign: "center",
-                          marginTop: "15px"
+                          marginTop: "15px",
                         }}
                       >
-                        <p>You have selected {selectedTiles?.length} pixels - Total cost for minting ${selectedTiles?.length}</p>
-                        <p>(But its free, as we are not charging any fees on the hackathon version)</p>
+                        <p>
+                          You have selected {selectedTiles?.length} pixels -
+                          Total cost for minting ${selectedTiles?.length}
+                        </p>
+                        <p>
+                          (But its free, as we are not charging any fees on the
+                          hackathon version)
+                        </p>
                       </div>
                       {isNFTMinting ? (
                         <button
