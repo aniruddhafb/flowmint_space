@@ -1,5 +1,5 @@
 export const mintNFT = `
-import MyNFT from 0xf73c8cad96ae5176
+import MyNFT from 0x3f42e39a475baeba
 
 transaction(ipfsHash: String, name: String, coordinate: String){
 

@@ -125,7 +125,7 @@ const MainPage = () => {
     }
   };
 
-  // getting onchain user col 
+  // getting onchain user col
   const check_user_col = async () => {
     const result = await fcl
       .send([
@@ -171,6 +171,8 @@ const MainPage = () => {
         ])
         .then(fcl.decode);
 
+      console.log(transactionId);
+
       const create_user = await axios({
         url: "/api/user",
         method: "POST",
@@ -212,6 +214,8 @@ const MainPage = () => {
         ])
         .then(fcl.decode);
 
+      console.log(txn_id);
+
       const save_nft = await axios({
         url: "/api/nft",
         method: "POST",
@@ -242,7 +246,9 @@ const MainPage = () => {
       return fcl.tx(txn_id).onceSealed();
     } catch (error) {
       console.log(error.message);
-      alert("Please switch to blockto wallet, other wallets are not supported yet!");
+      alert(
+        "Please switch to blockto wallet, other wallets are not supported yet!"
+      );
       logOut();
       window.location.reload();
     }
