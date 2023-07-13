@@ -65,7 +65,6 @@ const MainPage = () => {
     get_reserved_coordinates();
     getAllNFTsMongo();
     getUserNFTs();
-    // setupUser();
   }, []);
 
   // updating the canvas frequently on select
@@ -120,6 +119,7 @@ const MainPage = () => {
         .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
         .then(fcl.decode);
       setAllWalletNFTs(result);
+      console.log({ result: result })
     } catch (error) {
       console.log(error.message);
     }
