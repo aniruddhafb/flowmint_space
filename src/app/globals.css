@@ -86,3 +86,14 @@ canvas {
     display: none;
   }
 }
+
+#showSell {
+  display: none;
+}
+
+#hoverSell:hover #showSell {
+  display: block;
+}
+#hoverSell:hover #hideSell {
+  display: none;
+}

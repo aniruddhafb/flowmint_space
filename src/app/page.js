@@ -466,7 +466,7 @@ const MainPage = () => {
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   onClick={() => setMyNFTs(false)}
-                  style={{ position: "fixed", right: "8px", top: "75px" }}
+                  style={{ position: "fixed", right: "10px", top: "75px" }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -487,15 +487,20 @@ const MainPage = () => {
                       className="max-w-sm rounded overflow-hidden shadow-2xl"
                       key={index}
                     >
-                      <img
-                        className="w-[100%] h-[200px] p-[10px]"
-                        src={e.ipfsHash.replace(
-                          "ipfs://",
-                          "https://ipfs.io/ipfs/"
-                        )}
-                        height={100}
-                        width={100}
-                      />
+                      <a href={e.ipfsHash.replace(
+                        "ipfs://",
+                        "https://ipfs.io/ipfs/"
+                      )} target="_blank">
+                        <img
+                          className="w-[100%] h-[200px] p-[10px]"
+                          src={e.ipfsHash.replace(
+                            "ipfs://",
+                            "https://ipfs.io/ipfs/"
+                          )}
+                          height={100}
+                          width={100}
+                        />
+                      </a>
                       <div className="px-6 py-4">
                         <div className="font-bold text-xl mb-2">
                           {nft_info?.nft_name}{" "}
@@ -523,10 +528,24 @@ const MainPage = () => {
                             View on explorer 🡥
                           </span>
                         </a>
+                        <a
+                          href="#"
+                          id="hoverSell"
+                        >
+                          <span className="inline-block bg-gray-500 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-2 cursor-default">
+                            <span id="hideSell">Sell Segment</span>
+                            <span id="showSell">Coming Soon..</span>
+                          </span>
+                        </a>
                       </div>
                     </div>
                   );
                 })}
+                {allWalletNFTs?.length <= 0 &&
+                  <div className="font-bold text-xl mb-2 text-center">
+                    No NFTs Found!
+                  </div>
+                }
               </div>
             )}
 
