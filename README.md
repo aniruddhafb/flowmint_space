@@ -11,7 +11,11 @@ Upcoming features and fixes on flowmint.space platform
 
 > An optimized mobile version release
 
-> Enable editing for existing nft segments
+> Enable editing for existing NFT segments
+
+> Integration with multiple wallets
+
+> Introduce buy and sell NFT segment feature
 
 > Plan for the mainnet launch
 
