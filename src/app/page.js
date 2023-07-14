@@ -46,7 +46,11 @@ const MainPage = () => {
   fcl
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
-    .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
+    .put(
+      "discovery.wallet",
+      "https://flow-wallet-testnet.blocto.app/api/flow/authn"
+    )
+    .put("discovery.wallet.method", "HTTP/POST");
 
   // login
   const logIn = async () => {
