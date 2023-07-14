@@ -43,6 +43,7 @@ const MainPage = () => {
   const numColumns = 100;
   const numRows = 100;
 
+  // flow wallet and client config 
   fcl
     .config()
     .put("accessNode.api", " https://rest-testnet.onflow.org")
@@ -123,7 +124,6 @@ const MainPage = () => {
         .send([fcl.script(getNFTs), fcl.args([fcl.arg(user?.addr, t.Address)])])
         .then(fcl.decode);
       setAllWalletNFTs(result);
-      console.log({ result: result })
     } catch (error) {
       console.log(error.message);
     }
@@ -175,8 +175,6 @@ const MainPage = () => {
         ])
         .then(fcl.decode);
 
-      console.log(transactionId);
-
       const create_user = await axios({
         url: "/api/user",
         method: "POST",
@@ -218,8 +216,6 @@ const MainPage = () => {
         ])
         .then(fcl.decode);
 
-      console.log(txn_id);
-
       const save_nft = await axios({
         url: "/api/nft",
         method: "POST",
@@ -250,10 +246,10 @@ const MainPage = () => {
     } catch (error) {
       console.log(error.message);
       alert(
-        "Please switch to blockto wallet, other wallets are not supported yet!"
+        "User has rejected the transaction!"
       );
-      logOut();
-      window.location.reload();
+      // logOut();
+      // window.location.reload();
     }
     setNFTMinting(false);
   };
