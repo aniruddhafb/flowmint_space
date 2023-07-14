@@ -14,6 +14,12 @@ import Loader from "@/components/Loader.jsx";
 import { get_user_collection } from "../../cadence/scripts/check_collection.js";
 
 const MainPage = () => {
+  // default values 
+  const tileSize = 10;
+  const numColumns = 100;
+  const numRows = 100;
+  const deployedContractAddr = "3f42e39a475baeba";
+
   const storage = new ThirdwebStorage();
 
   const [reserved_coordinates, set_reserved_coordinates] = useState([]);
@@ -39,9 +45,6 @@ const MainPage = () => {
   const [allMongoNFTs, setAllMongoNFTs] = useState([]);
   const [startTile, setStartTile] = useState(null);
   const [tileColors, setTileColors] = useState({});
-  const tileSize = 10;
-  const numColumns = 100;
-  const numRows = 100;
 
   // flow wallet and client config 
   fcl
@@ -517,7 +520,8 @@ const MainPage = () => {
                       </div>
                       <div className="px-6 pt-4 pb-2">
                         <a
-                          href={`https://testnet.flowscan.org/transaction/${e.uuid}`}
+                          href={`https://testnet.flowscan.org/contract/A.${deployedContractAddr}.MyNFT/interactions`}
+                          // href={`https://testnet.flowscan.org/transaction/${e.uuid}`}
                           target="_blank"
                         >
                           <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
