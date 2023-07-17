@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import defaultAvatar from "../../public/avatar.png";
 import webLogo from "../../public/whitefav.png";
+import { GiHelp } from "react-icons/gi"
+import { BiHelpCircle } from "react-icons/bi";
 
 const Navbar = ({ userAddress, logIn, logOut, setMyNFTs }) => {
 
@@ -61,6 +63,9 @@ const Navbar = ({ userAddress, logIn, logOut, setMyNFTs }) => {
                     {/* navbar drop down  */}
                     {navDropDown ? (
                         <div className="absolute inset-x-0 z-10 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-[#21004b] lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center">
+                            <a href="https://www.youtube.com/watch?v=CXhwNgpYEMI&ab_channel=AniruddhaVikharankar" target="_blank">
+                                <BiHelpCircle style={{ height: "30px", width: "30px", marginRight: "30px" }} className="text-gray-400 hover:text-gray-200" />
+                            </a>
                             {userAddress ? (
                                 <div className="flex flex-row">
                                     <div className="relative flex items-center mt-4 lg:mt-0">

@@ -299,6 +299,7 @@ const MainPage = () => {
     const pxl = `${startColumn.toString() + startRow.toString()}`;
 
     setStartTile({ column: startColumn, row: startRow });
+    console.log({ pixel_data: pixel_data })
     pixel_data.map((e) => {
       const startingNumberRegex = /^\d+/;
       const startingNumber = e.match(startingNumberRegex)[0];
