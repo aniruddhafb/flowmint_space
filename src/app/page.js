@@ -620,6 +620,7 @@ const MainPage = () => {
                         <input
                           type="text"
                           className="text-black"
+                          maxLength={20}
                           required
                           onChange={(e) => set_nft_name(e.target.value)}
                           placeholder="eg - Steady Rocks"
@@ -641,7 +642,7 @@ const MainPage = () => {
                       >
                         <p>Link - </p>
                         <input
-                          type="text"
+                          type="url"
                           className="text-black"
                           required
                           onChange={(e) => set_nft_link(e.target.value)}
