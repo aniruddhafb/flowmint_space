@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import defaultAvatar from "../../public/avatar.png";
 import webLogo from "../../public/whitefav.png";
-import { GiHelp } from "react-icons/gi"
 import { BiHelpCircle } from "react-icons/bi";
 
 const Navbar = ({ userAddress, logIn, logOut, setMyNFTs }) => {
