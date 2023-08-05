@@ -12,6 +12,7 @@
     "@air/react-drag-to-select": "^5.0.8",
     "@onflow/fcl": "^1.4.1",
     "@onflow/types": "^1.1.0",
+    "@thirdweb-dev/react": "^3.14.27",
     "@thirdweb-dev/storage": "^1.1.6",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",

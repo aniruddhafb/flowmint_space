@@ -2,7 +2,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as fcl from "@onflow/fcl";
 import * as t from "@onflow/types";
-import { ThirdwebStorage } from "@thirdweb-dev/storage";
 import { mintNFT } from "../../cadence/transactions/mint_nfts.js";
 import { setupUserTx } from "../../cadence/transactions/setup_user.js";
 
@@ -12,6 +11,8 @@ import Navbar from "@/components/Navbar.jsx";
 import axios from "axios";
 import Loader from "@/components/Loader.jsx";
 import { get_user_collection } from "../../cadence/scripts/check_collection.js";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
+import MintMethod from "@/components/MintMethod.jsx";
 
 const MainPage = () => {
   // default values 
@@ -19,8 +20,6 @@ const MainPage = () => {
   const numColumns = 100;
   const numRows = 100;
   const deployedContractAddr = "3f42e39a475baeba";
-
-  const storage = new ThirdwebStorage();
 
   const [reserved_coordinates, set_reserved_coordinates] = useState([]);
   const [pixel_data, set_pixel_data] = useState([]);
@@ -31,7 +30,8 @@ const MainPage = () => {
   const [nft_iniNFTCord, set_IniNFTCord] = useState("");
   const [nftHeight, set_nftHeight] = useState("");
   const [nftWidth, set_nftWidth] = useState("");
-  const [file, set_file] = useState();
+
+  const [ipfs_hash, set_ipfs_hash] = useState("");
 
   const [isMintingModal, setIsMinting] = useState(false);
   const [isNFTMinting, setNFTMinting] = useState(false);
@@ -194,7 +194,7 @@ const MainPage = () => {
     setNFTMinting(true);
     try {
       await setupUser();
-      const ipfs_hash = await storage.upload(file);
+      // const ipfs_hash = await storage.upload(file);
       const nft_data = JSON.stringify({
         ipfs_hash,
         nft_name,
@@ -418,7 +418,7 @@ const MainPage = () => {
       {isLoading ? (
         <Loader />
       ) : (
-        <>
+        <ThirdwebProvider clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENTID}>
           <Navbar
             userAddress={user?.addr}
             logIn={logIn}
@@ -669,23 +669,10 @@ const MainPage = () => {
                           (Please prefer {nftWidth}X{nftHeight}px Image){" "}
                         </p>
                       </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <p style={{ marginLeft: "76px" }}>Select Image - </p>
-                        <input
-                          type="file"
-                          className="text"
-                          required
-                          onChange={(e) => set_file(e.target.files[0])}
-                          style={{ margin: "12px 0", padding: "4px" }}
-                        />
-                      </div>
+
+                      {/* uploading file  */}
+                      <MintMethod set_ipfs_hash={set_ipfs_hash} setLoading={setLoading} />
+
                       <div
                         style={{
                           display: "flex",
@@ -746,7 +733,7 @@ const MainPage = () => {
           </div>
 
           <Footer />
-        </>
+        </ThirdwebProvider>
       )}
     </>
   );
