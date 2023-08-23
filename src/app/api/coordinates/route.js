@@ -11,7 +11,6 @@ export async function GET(request) {
   let arr = [];
 
   for (let i = 0; i < all_coordinates.length; i++) {
-    console.log(all_coordinates[i]);
     JSON.parse(all_coordinates[i]["coordinates"]).map((e) =>
       arr.push(
         `${e}/title=${all_coordinates[i].title}/link=${all_coordinates[i].link}`
@@ -26,7 +25,6 @@ export async function POST(request) {
   dbConnect();
 
   const { new_coordinate, title, link } = await request.json();
-  console.log({ title, link });
 
   const save_coordinate = await coordinates.create({
     coordinates: new_coordinate,

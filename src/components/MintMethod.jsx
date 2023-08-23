@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { useStorage } from "@thirdweb-dev/react";
 
-const MintMethod = ({ set_ipfs_hash }) => {
+const MintMethod = ({ set_ipfs_hash, compLoading, setCompLoading }) => {
 
     const storage = useStorage();
-    const [isLoading, setLoading] = useState(false);
+    // const [isLoading, setLoading] = useState(false);
     const [isUploaded, setIsUploaded] = useState(false);
 
     return (
@@ -19,7 +19,7 @@ const MintMethod = ({ set_ipfs_hash }) => {
             <p style={{ marginLeft: "76px" }}>Select Image - </p>
             {!isUploaded ?
                 (
-                    isLoading ?
+                    compLoading ?
                         "uploading please wait.."
                         :
                         <input
@@ -27,11 +27,10 @@ const MintMethod = ({ set_ipfs_hash }) => {
                             className="text"
                             required
                             onChange={(async (e) => {
-                                setLoading(true);
+                                setCompLoading(true);
                                 const ipfs_upload = await storage.upload(e.target.files[0]);
                                 set_ipfs_hash(ipfs_upload);
-                                console.log(ipfs_upload);
-                                setLoading(false);
+                                setCompLoading(false);
                                 setIsUploaded(true);
                             })}
                             style={{ margin: "12px 0", padding: "4px" }}
